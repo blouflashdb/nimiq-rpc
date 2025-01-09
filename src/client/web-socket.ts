@@ -1,25 +1,7 @@
 import type { JSONRPCError } from '@open-rpc/client-js'
 import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
-import type { Auth, RPCData } from '../types/'
+import type { RPCData } from '../types/'
 import { Client, RequestManager, WebSocketTransport } from '@open-rpc/client-js'
-
-let shownWarning = false
-
-function getWs(url: URL, auth?: Auth) {
-  if (auth && !shownWarning) {
-    console.warn('Warning: Auth in WebSocket is not supported in the browser by default unless you create a custom proxy server that converts `username` and `password` to `Authorization` headers.')
-    shownWarning = true
-  }
-
-  const transport = new WebSocketTransport(url.toString())
-  const client = new Client(new RequestManager([transport]))
-  return { client, transport }
-}
-
-export interface ErrorStreamReturn {
-  code: number
-  message: string
-}
 
 export interface Subscription<Data, Metadata> {
   next: (callback: (data: RPCData<Data, Metadata> | JSONRPCError) => void) => void
@@ -72,26 +54,21 @@ export class WebSocketClient {
   private url: URL
   private isOpen = false
   private explicitlyClosed = false
-  private auth?: Auth
 
   // For reconnect logic
   private retriesCount = 0
   private reconnectTimer?: ReturnType<typeof setTimeout>
 
-  constructor(url: URL | string, auth?: Auth) {
+  constructor(url: URL | string) {
     if (typeof url === 'string') {
       url = new URL(url)
     }
     const wsUrl = new URL(url.href.replace(/^http/, 'ws'))
     wsUrl.pathname = '/ws'
     this.url = wsUrl
-
-    if (auth?.username && auth?.password) {
-      this.auth = auth
-    }
   }
 
-  private clearReconnectTimer() {
+  private clearReconnectTimer(): void {
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer)
       this.reconnectTimer = undefined
@@ -105,7 +82,8 @@ export class WebSocketClient {
     request: RequestArguments,
     userOptions: StreamOptions,
   ): Promise<Subscription<Data, Metadata>> {
-    const { client, transport } = getWs(this.url, this.auth)
+    const transport = new WebSocketTransport(this.url.toString())
+    const client = new Client(new RequestManager([transport]))
 
     const options = {
       ...WS_DEFAULT_OPTIONS,
@@ -157,8 +135,7 @@ export class WebSocketClient {
       isConnectionOpen: () => this.isOpen,
       context: {
         body: request,
-        // For security reasons, remove query params
-        url: this.url.href.split('?')[0],
+        url: this.url.toString(),
         timestamp: Date.now(),
       },
       ws: client,
@@ -176,7 +153,7 @@ export class WebSocketClient {
         if (reconnectSettings) {
           const maxRetries = reconnectSettings.retries ?? -1
           const delay = reconnectSettings.delay ?? 1000
-          const canKeepRetrying = () => {
+          const canKeepRetrying = (): boolean => {
             if (typeof maxRetries === 'number') {
               return maxRetries < 0 || this.retriesCount < maxRetries
             }

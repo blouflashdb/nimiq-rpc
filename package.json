@@ -1,52 +1,24 @@
 {
-  "name": "nimiq-rpc-client-ts",
+  "name": "@blouflash/nimiq-rpc",
   "type": "module",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0",
   "private": false,
-  "packageManager": "pnpm@9.14.2",
-  "description": "A Nimiq RPC client for TypeScript",
+  "packageManager": "pnpm@9.15.3",
+  "description": "A Nimiq RPC client for Nodejs",
   "author": "onmax",
   "license": "MIT",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "main": "dist/index.mjs",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "dev": "unbuild --stub",
-    "test": "vitest run",
-    "build": "unbuild",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
-    "ci": "pnpm lint && pnpm build",
-    "release": "pnpm lint && pnpm build && bumpp --commit --push --tag && pnpm publish"
-  },
   "dependencies": {
     "@open-rpc/client-js": "^1.8.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^3.9.2",
-    "@changesets/cli": "^2.27.10",
+    "@antfu/eslint-config": "^3.13.0",
+    "@types/node": "^22.10.5",
     "@types/ws": "^8.5.13",
-    "bumpp": "^9.8.1",
-    "dotenv": "^16.4.5",
-    "eslint": "^9.15.0",
-    "lint-staged": "^15.2.10",
-    "pkg-pr-new": "^0.0.31",
+    "eslint": "^9.17.0",
+    "lint-staged": "^15.3.0",
     "simple-git": "^3.27.0",
     "simple-git-hooks": "^2.11.1",
-    "typescript": "^5.7.2",
-    "unbuild": "^2.0.0",
-    "vite": "^5.4.11",
-    "vitest": "^2.1.5"
+    "typescript": "^5.7.3"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"

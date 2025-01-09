@@ -26,7 +26,7 @@ export class NimiqRPCClient {
    */
   constructor(url: URL | string, auth?: Auth) {
     this.http = new HttpClient(url, auth)
-    this.ws = new WebSocketClient(url, auth)
+    this.ws = new WebSocketClient(url)
 
     this.blockchain = new Modules.BlockchainClient.BlockchainClient(this.http)
     this.blockchainStreams = new Modules.BlockchainStream.BlockchainStream(
@@ -81,7 +81,7 @@ export class NimiqRPCClient {
 }
 
 let client: NimiqRPCClient
-export function createClient(url: URL | string, auth?: Auth) {
+export function createClient(url: URL | string, auth?: Auth): NimiqRPCClient {
   if (client)
     return client
   client = new NimiqRPCClient(url, auth)
