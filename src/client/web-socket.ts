@@ -1,3 +1,4 @@
+import type { JSONRPCError } from '@open-rpc/client-js'
 import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
 import type { Auth, RPCData } from '../types/'
 import { Client, RequestManager, WebSocketTransport } from '@open-rpc/client-js'
@@ -21,7 +22,7 @@ export interface ErrorStreamReturn {
 }
 
 export interface Subscription<Data, Metadata> {
-  next: (callback: (data: MaybeStreamResponse<Data, Metadata>) => void) => void
+  next: (callback: (data: RPCData<Data, Metadata> | JSONRPCError) => void) => void
   close: () => void
   ws: Client
 
@@ -41,18 +42,6 @@ export const WS_DEFAULT_OPTIONS: StreamOptions = {
   filter: () => true,
   timeout: 5000, // Default OpenRPC timeout
 } as const
-
-export type MaybeStreamResponse<Data, Metadata> =
-  | {
-    error: ErrorStreamReturn
-    data: undefined
-    metadata: undefined
-  }
-  | {
-    error: undefined
-    data: Data
-    metadata: Metadata
-  }
 
 export type FilterStreamFn = (data: any) => boolean
 
@@ -139,38 +128,20 @@ export class WebSocketClient {
     this.retriesCount = 0 // reset retries on successful open
 
     const args: Subscription<Data, Metadata> = {
-      next: (callback: (data: MaybeStreamResponse<Data, Metadata>) => void) => {
+      next: (callback: (data: RPCData<Data, Metadata> | JSONRPCError) => void) => {
         client.onError((error) => {
-          callback({
-            data: undefined,
-            metadata: undefined,
-            error,
-          })
+          callback(error)
         })
 
         client.onNotification(async (event) => {
           const params = event.params as NotificationMessageParams
-
-          // I dont think this will ever happen
-          if (!('result' in params)) {
-            callback({
-              data: undefined,
-              metadata: undefined,
-              error: {
-                code: 1000,
-                message: 'No result in event',
-              },
-            })
-            return
-          }
-
           const result = params.result as RPCData<Data, Metadata>
 
           if (filter && !filter(result.data)) {
             return
           }
 
-          callback({ data: result.data, metadata: result.metadata, error: undefined })
+          callback(result)
 
           if (once) {
             client.close()
