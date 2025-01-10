@@ -10,15 +10,15 @@ export class NimiqRPCClient {
   public http: HttpClient
   public ws: WebSocketClient
 
-  public blockchain
-  public blockchainStreams
-  public consensus
-  public mempool
-  public network
-  public policy
-  public validator
-  public wallet
-  public zkpComponent
+  public blockchain: Modules.BlockchainClient.BlockchainClient
+  public blockchainStreams: Modules.BlockchainStream.BlockchainStream
+  public consensus: Modules.ConsensusClient.ConsensusClient
+  public mempool: Modules.MempoolClient.MempoolClient
+  public network: Modules.NetworkClient.NetworkClient
+  public policy: Modules.PolicyClient.PolicyClient
+  public validator: Modules.ValidatorClient.ValidatorClient
+  public wallet: Modules.WalletClient.WalletClient
+  public zkpComponent: Modules.ZkpComponentClient.ZkpComponentClient
 
   /**
    * @param url Node URL
