@@ -1,5 +1,6 @@
-import type { HttpClient } from '../client/http'
-import { DEFAULT_OPTIONS } from '../client/http'
+import type { HttpClient } from '../client/http.ts'
+import { DEFAULT_OPTIONS } from '../client/http.ts'
+import type { RPCData } from "../types/logs.ts";
 
 export class NetworkClient {
   private client: HttpClient
@@ -11,21 +12,21 @@ export class NetworkClient {
   /**
    * The peer ID for our local peer.
    */
-  public async getPeerId(options = DEFAULT_OPTIONS) {
+  public getPeerId(options = DEFAULT_OPTIONS): Promise<Error | RPCData<string>> {
     return this.client.call<string>({ method: 'getPeerId' }, options)
   }
 
   /**
    * Returns the number of peers.
    */
-  public async getPeerCount(options = DEFAULT_OPTIONS) {
+  public getPeerCount(options = DEFAULT_OPTIONS): Promise<Error | RPCData<number>> {
     return this.client.call<number>({ method: 'getPeerCount' }, options)
   }
 
   /**
    * Returns a list with the IDs of all our peers.
    */
-  public async getPeerList(options = DEFAULT_OPTIONS) {
+  public getPeerList(options = DEFAULT_OPTIONS): Promise<Error | RPCData<string[]>> {
     return this.client.call<string[]>({ method: 'getPeerList' }, options)
   }
 }

@@ -1,4 +1,4 @@
-import type { HttpClient } from '../client/http'
+import type { HttpClient } from '../client/http.ts'
 import type {
   Account,
   Block,
@@ -7,26 +7,25 @@ import type {
   LogType,
   PartialBlock,
   PenalizedSlots,
+  RPCData,
   Slot,
   Staker,
   Transaction,
   Validator,
-} from '../types/'
-import { DEFAULT_OPTIONS } from '../client/http'
+} from '../types/index.ts'
+import { DEFAULT_OPTIONS } from '../client/http.ts'
 
 export interface GetBlockByHashParams { includeBody?: boolean }
 export interface GetBlockByBlockNumberParams { includeBody?: boolean }
 export interface GetLatestBlockParams { includeBody?: boolean }
 export interface GetSlotAtBlockParams {
   offsetOpt?: number
-  withMetadata?: boolean
 }
 export interface GetTransactionsByAddressParams {
   max: number
   startAt: string
   justHashes?: boolean
 }
-export interface GetAccountByAddressParams { withMetadata?: boolean }
 export interface GetValidatorByAddressParams { address: string }
 export interface GetStakersByAddressParams { address: string }
 export interface GetStakerByAddressParams { address: string }
@@ -47,32 +46,32 @@ export class BlockchainClient {
   /**
    * Returns the block number for the current head.
    */
-  public async getBlockNumber(options = DEFAULT_OPTIONS) {
-    return this.client.call<number>({ method: 'getBlockNumber' }, options)
+  public getBlockNumber<T = number>(options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'getBlockNumber' }, options)
   }
 
   /**
    * Returns the batch number for the current head.
    */
-  public async getBatchNumber(options = DEFAULT_OPTIONS) {
-    return this.client.call<number>({ method: 'getBatchNumber' }, options)
+  public getBatchNumber<T = number>(options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'getBatchNumber' }, options)
   }
 
   /**
    * Returns the epoch number for the current head.
    */
-  public async getEpochNumber(options = DEFAULT_OPTIONS) {
-    return this.client.call<number>({ method: 'getEpochNumber' }, options)
+  public getEpochNumber<T = number>(options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'getEpochNumber' }, options)
   }
 
   /**
    * Tries to fetch a block given its hash. It has an option to include the transactions in the block, which defaults to false.
    */
-  public async getBlockByHash<T extends GetBlockByHashParams>(
+  public getBlockByHash<T extends GetBlockByHashParams>(
     hash: string,
     p?: T,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<T['includeBody'] extends true ? Block : PartialBlock>> {
     return this.client.call<
       T['includeBody'] extends true ? Block : PartialBlock
     >(
@@ -84,11 +83,11 @@ export class BlockchainClient {
   /**
    * Tries to fetch a block given its number. It has an option to include the transactions in the block, which defaults to false.
    */
-  public async getBlockByNumber<T extends GetBlockByBlockNumberParams>(
+  public getBlockByNumber<T extends GetBlockByBlockNumberParams>(
     blockNumber: number,
     p?: T,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<T['includeBody'] extends true ? Block : PartialBlock>> {
     return this.client.call<
       T['includeBody'] extends true ? Block : PartialBlock
     >({
@@ -101,10 +100,10 @@ export class BlockchainClient {
    * Returns the block at the head of the main chain. It has an option to include the
    * transactions in the block, which defaults to false.
    */
-  public async getLatestBlock<T extends GetLatestBlockParams>(
+  public getLatestBlock<T extends GetLatestBlockParams>(
     p = { includeBody: false } as T,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<T['includeBody'] extends true ? Block : PartialBlock>> {
     const req = { method: 'getLatestBlock', params: [p.includeBody] }
     return this.client.call<
       T['includeBody'] extends true ? Block : PartialBlock
@@ -116,22 +115,21 @@ export class BlockchainClient {
    * offset is optional, it will default to getting the offset for the existing block
    * at the given height.
    */
-  public async getSlotAt<T extends GetSlotAtBlockParams>(
+  public getSlotAt<T extends GetSlotAtBlockParams>(
     blockNumber: number,
     p?: T,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<Slot>> {
     return this.client.call<Slot>({
       method: 'getSlotAt',
       params: [blockNumber, p?.offsetOpt],
-      withMetadata: p?.withMetadata,
     }, options)
   }
 
   /**
    * Fetches the transaction(s) given the hash.
    */
-  public async getTransactionByHash(hash: string, options = DEFAULT_OPTIONS) {
+  public getTransactionByHash(hash: string, options = DEFAULT_OPTIONS): Promise<Error | RPCData<Transaction>> {
     return this.client.call<Transaction>({
       method: 'getTransactionByHash',
       params: [hash],
@@ -141,10 +139,10 @@ export class BlockchainClient {
   /**
    * Fetches the transaction(s) given the block number.
    */
-  public async getTransactionsByBlockNumber(
+  public getTransactionsByBlockNumber(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<Transaction[]>> {
     return this.client.call<Transaction[]>({
       method: 'getTransactionsByBlockNumber',
       params: [blockNumber],
@@ -154,10 +152,10 @@ export class BlockchainClient {
   /**
    * Fetches the transaction(s) given the batch number.
    */
-  public async getTransactionsByBatchNumber(
+  public getTransactionsByBatchNumber(
     batchIndex: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<Transaction[]>> {
     return this.client.call<Transaction[]>({
       method: 'getTransactionsByBatchNumber',
       params: [batchIndex],
@@ -172,13 +170,13 @@ export class BlockchainClient {
    * transactions are also returned. It has an option to specify the maximum number of transactions
    * to fetch, it defaults to 500.
    */
-  public async getTransactionsByAddress<
+  public getTransactionsByAddress<
     T extends GetTransactionsByAddressParams,
   >(
     address: string,
     p: T,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<T['justHashes'] extends true ? string[] : Transaction[]>> {
     const req = {
       method: p?.justHashes
         ? 'getTransactionHashesByAddress'
@@ -194,10 +192,10 @@ export class BlockchainClient {
    * Returns all the inherents (including reward inherents) give the block number. Note
    * that this only considers blocks in the main chain.
    */
-  public async getInherentsByBlockNumber(
+  public getInherentsByBlockNumber(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<Inherent[]>> {
     return this.client.call<Inherent[]>({
       method: 'getInherentsByBlockNumber',
       params: [blockNumber],
@@ -208,10 +206,10 @@ export class BlockchainClient {
    * Returns all the inherents (including reward inherents) give the batch number. Note
    * that this only considers blocks in the main chain.
    */
-  public async getInherentsByBatchNumber(
+  public getInherentsByBatchNumber(
     batchIndex: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<Inherent[]>> {
     return this.client.call<Inherent[]>({
       method: 'getInherentsByBatchNumber',
       params: [batchIndex],
@@ -221,19 +219,17 @@ export class BlockchainClient {
   /**
    * Tries to fetch the account at the given address.
    */
-  public async getAccountByAddress<T extends { withMetadata?: boolean }>(
+  public getAccountByAddress(
     address: string,
-    { withMetadata }: T,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<Account, BlockchainState>> {
     const req = {
       method: 'getAccountByAddress',
       params: [address],
-      withMetadata,
     }
     return this.client.call<
       Account,
-      T['withMetadata'] extends true ? BlockchainState : undefined
+      BlockchainState
     >(req, options)
   }
 
@@ -242,7 +238,7 @@ export class BlockchainClient {
    * IMPORTANT: This operation iterates over all accounts in the accounts tree
    * and thus is extremely computationally expensive.
    */
-  public async getAccounts(options = DEFAULT_OPTIONS) {
+  public getAccounts(options = DEFAULT_OPTIONS): Promise<Error | RPCData<Account[]>> {
     return this.client.call<Account[]>({
       method: 'getAccounts',
     }, options)
@@ -251,45 +247,39 @@ export class BlockchainClient {
   /**
    * Returns a collection of the currently active validator's addresses and balances.
    */
-  public async getActiveValidators<T extends { withMetadata?: boolean }>(
-    { withMetadata }: T = { withMetadata: false } as T,
+  public getActiveValidators(
     options = DEFAULT_OPTIONS,
-  ) {
-    const req = { method: 'getActiveValidators', withMetadata }
+  ): Promise<Error | RPCData<Validator[]>> {
+    const req = { method: 'getActiveValidators' }
     return this.client.call<
-      Validator[],
-      T['withMetadata'] extends true ? BlockchainState : undefined
+      Validator[]
     >(req, options)
   }
 
-  public async getCurrentPenalizedSlots<T extends { withMetadata?: boolean }>(
-    { withMetadata }: T = { withMetadata: false } as T,
+  public getCurrentPenalizedSlots(
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<PenalizedSlots[]>> {
     return this.client.call<PenalizedSlots[]>({
       method: 'getCurrentPenalizedSlots',
-      withMetadata,
     }, options)
   }
 
-  public async getPreviousPenalizedSlots<T extends { withMetadata?: boolean }>(
-    { withMetadata }: T = { withMetadata: false } as T,
+  public getPreviousPenalizedSlots(
     options = DEFAULT_OPTIONS,
-  ) {
-    const req = { method: 'getPreviousPenalizedSlots', withMetadata }
+  ): Promise<Error | RPCData<PenalizedSlots[]>> {
+    const req = { method: 'getPreviousPenalizedSlots' }
     return this.client.call<
-      PenalizedSlots[],
-      T['withMetadata'] extends true ? BlockchainState : undefined
+      PenalizedSlots[]
     >(req, options)
   }
 
   /**
    * Tries to fetch a validator information given its address.
    */
-  public async getValidatorByAddress(
+  public getValidatorByAddress(
     address: string,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<Validator>> {
     return this.client.call<Validator>({
       method: 'getValidatorByAddress',
       params: [address],
@@ -301,7 +291,7 @@ export class BlockchainClient {
    * IMPORTANT: This operation iterates over all validators in the staking contract
    * and thus is extremely computationally expensive.
    */
-  public async getValidators(options = DEFAULT_OPTIONS) {
+  public getValidators(options = DEFAULT_OPTIONS): Promise<Error | RPCData<Validator[]>> {
     return this.client.call<Validator[]>({
       method: 'getValidators',
     }, options)
@@ -312,10 +302,10 @@ export class BlockchainClient {
    * IMPORTANT: This operation iterates over all stakers of the staking contract
    * and thus is extremely computationally expensive.
    */
-  public async getStakersByValidatorAddress(
+  public getStakersByValidatorAddress(
     address: string,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<Staker[]>> {
     return this.client.call<Staker[]>({
       method: 'getStakersByValidatorAddress',
       params: [address],
@@ -325,7 +315,7 @@ export class BlockchainClient {
   /**
    * Tries to fetch a staker information given its address.
    */
-  public async getStakerByAddress(address: string, options = DEFAULT_OPTIONS) {
+  public getStakerByAddress(address: string, options = DEFAULT_OPTIONS): Promise<Error | RPCData<Staker>> {
     return this.client.call<Staker>({
       method: 'getStakerByAddress',
       params: [address],

@@ -1,32 +1,31 @@
 import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
-import type { CallResult, HttpOptions } from './client/http'
-import type { StreamOptions, Subscription } from './client/web-socket'
-import type { Auth } from './types/'
-import { DEFAULT_OPTIONS, HttpClient } from './client/http'
-import { WebSocketClient } from './client/web-socket'
-import * as Modules from './modules'
+import type { HttpOptions } from './src/client/http.ts'
+import type { StreamOptions, Subscription } from './src/client/web-socket.ts'
+import type { RPCData } from './src/types/logs.ts'
+import { DEFAULT_OPTIONS, HttpClient } from './src/client/http.ts'
+import { WebSocketClient } from './src/client/web-socket.ts'
+import * as Modules from './src/modules/index.ts'
 
 export class NimiqRPCClient {
   public http: HttpClient
   public ws: WebSocketClient
 
-  public blockchain
-  public blockchainStreams
-  public consensus
-  public mempool
-  public network
-  public policy
-  public validator
-  public wallet
-  public zkpComponent
+  public blockchain: Modules.BlockchainClient.BlockchainClient
+  public blockchainStreams: Modules.BlockchainStream.BlockchainStream
+  public consensus: Modules.ConsensusClient.ConsensusClient
+  public mempool: Modules.MempoolClient.MempoolClient
+  public network: Modules.NetworkClient.NetworkClient
+  public policy: Modules.PolicyClient.PolicyClient
+  public validator: Modules.ValidatorClient.ValidatorClient
+  public wallet: Modules.WalletClient.WalletClient
+  public zkpComponent: Modules.ZkpComponentClient.ZkpComponentClient
 
   /**
-   * @param url Node URL [?secret=secret]
-   * @param auth { username, password }
+   * @param url Node URL
    */
-  constructor(url: URL | string, auth?: Auth) {
-    this.http = new HttpClient(url, auth)
-    this.ws = new WebSocketClient(url, auth)
+  constructor(url: string) {
+    this.http = new HttpClient(url)
+    this.ws = new WebSocketClient(url)
 
     this.blockchain = new Modules.BlockchainClient.BlockchainClient(this.http)
     this.blockchainStreams = new Modules.BlockchainStream.BlockchainStream(
@@ -34,8 +33,6 @@ export class NimiqRPCClient {
     )
     this.consensus = new Modules.ConsensusClient.ConsensusClient(
       this.http,
-      this.blockchain,
-      this.blockchainStreams,
     )
     this.mempool = new Modules.MempoolClient.MempoolClient(this.http)
     this.network = new Modules.NetworkClient.NetworkClient(this.http)
@@ -51,14 +48,13 @@ export class NimiqRPCClient {
    * @param request - The request object containing the following properties:
    * @param request.method - The name of the method to call.
    * @param request.params - The parameters to pass with the call, if any.
-   * @param request.withMetadata - Flag indicating whether metadata should be included in the response.
    * @param options - The HTTP options for the call. Defaults to DEFAULT_OPTIONS if not provided.
    * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
-  async call<Data, Metadata = undefined>(
-    request: { method: string, params?: any[], withMetadata?: boolean },
+  call<Data, Metadata = undefined>(
+    request: RequestArguments,
     options: HttpOptions = DEFAULT_OPTIONS,
-  ): Promise<CallResult<Data, Metadata>> {
+  ): Promise<RPCData<Data, Metadata> | Error> {
     return this.http.call<Data, Metadata>(request, options)
   }
 
@@ -69,7 +65,7 @@ export class NimiqRPCClient {
    * @param userOptions
    * @returns A promise that resolves with a Subscription object.
    */
-  async subscribe<
+  subscribe<
     Data,
     Metadata,
   >(
@@ -81,15 +77,15 @@ export class NimiqRPCClient {
 }
 
 let client: NimiqRPCClient
-export function createClient(url: URL | string, auth?: Auth) {
+export function createClient(url: string): NimiqRPCClient {
   if (client)
     return client
-  client = new NimiqRPCClient(url, auth)
+  client = new NimiqRPCClient(url)
   return client
 }
 
-export * from './client/http'
-export * from './client/web-socket'
-export * from './modules'
-export * from './types/'
-export * from './types/logs'
+export * from './src/client/http.ts'
+export * from './src/client/web-socket.ts'
+export * from './src/modules/index.ts'
+export * from './src/types/index.ts'
+export * from './src/types/logs.ts'

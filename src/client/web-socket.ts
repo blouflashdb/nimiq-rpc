@@ -1,27 +1,10 @@
+import type { JSONRPCError } from '@open-rpc/client-js'
 import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
-import type { Auth, RPCData } from '../types/'
+import type { RPCData } from '../types/index.ts'
 import { Client, RequestManager, WebSocketTransport } from '@open-rpc/client-js'
 
-let shownWarning = false
-
-function getWs(url: URL, auth?: Auth) {
-  if (auth && !shownWarning) {
-    console.warn('Warning: Auth in WebSocket is not supported in the browser by default unless you create a custom proxy server that converts `username` and `password` to `Authorization` headers.')
-    shownWarning = true
-  }
-
-  const transport = new WebSocketTransport(url.toString())
-  const client = new Client(new RequestManager([transport]))
-  return { client, transport }
-}
-
-export interface ErrorStreamReturn {
-  code: number
-  message: string
-}
-
 export interface Subscription<Data, Metadata> {
-  next: (callback: (data: MaybeStreamResponse<Data, Metadata>) => void) => void
+  next: (callback: (data: RPCData<Data, Metadata> | JSONRPCError) => void) => void
   close: () => void
   ws: Client
 
@@ -42,18 +25,7 @@ export const WS_DEFAULT_OPTIONS: StreamOptions = {
   timeout: 5000, // Default OpenRPC timeout
 } as const
 
-export type MaybeStreamResponse<Data, Metadata> =
-  | {
-    error: ErrorStreamReturn
-    data: undefined
-    metadata: undefined
-  }
-  | {
-    error: undefined
-    data: Data
-    metadata: Metadata
-  }
-
+// deno-lint-ignore no-explicit-any
 export type FilterStreamFn = (data: any) => boolean
 
 export interface StreamOptions {
@@ -83,26 +55,18 @@ export class WebSocketClient {
   private url: URL
   private isOpen = false
   private explicitlyClosed = false
-  private auth?: Auth
 
   // For reconnect logic
   private retriesCount = 0
   private reconnectTimer?: ReturnType<typeof setTimeout>
 
-  constructor(url: URL | string, auth?: Auth) {
-    if (typeof url === 'string') {
-      url = new URL(url)
-    }
-    const wsUrl = new URL(url.href.replace(/^http/, 'ws'))
+  constructor(url: string) {
+    const wsUrl = new URL(url.replace(/^http/, 'ws'))
     wsUrl.pathname = '/ws'
     this.url = wsUrl
-
-    if (auth?.username && auth?.password) {
-      this.auth = auth
-    }
   }
 
-  private clearReconnectTimer() {
+  private clearReconnectTimer(): void {
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer)
       this.reconnectTimer = undefined
@@ -116,7 +80,8 @@ export class WebSocketClient {
     request: RequestArguments,
     userOptions: StreamOptions,
   ): Promise<Subscription<Data, Metadata>> {
-    const { client, transport } = getWs(this.url, this.auth)
+    const transport = new WebSocketTransport(this.url.toString())
+    const client = new Client(new RequestManager([transport]))
 
     const options = {
       ...WS_DEFAULT_OPTIONS,
@@ -139,38 +104,20 @@ export class WebSocketClient {
     this.retriesCount = 0 // reset retries on successful open
 
     const args: Subscription<Data, Metadata> = {
-      next: (callback: (data: MaybeStreamResponse<Data, Metadata>) => void) => {
+      next: (callback: (data: RPCData<Data, Metadata> | JSONRPCError) => void) => {
         client.onError((error) => {
-          callback({
-            data: undefined,
-            metadata: undefined,
-            error,
-          })
+          callback(error)
         })
 
-        client.onNotification(async (event) => {
+        client.onNotification((event) => {
           const params = event.params as NotificationMessageParams
-
-          // I dont think this will ever happen
-          if (!('result' in params)) {
-            callback({
-              data: undefined,
-              metadata: undefined,
-              error: {
-                code: 1000,
-                message: 'No result in event',
-              },
-            })
-            return
-          }
-
           const result = params.result as RPCData<Data, Metadata>
 
           if (filter && !filter(result.data)) {
             return
           }
 
-          callback({ data: result.data, metadata: result.metadata, error: undefined })
+          callback(result)
 
           if (once) {
             client.close()
@@ -186,8 +133,7 @@ export class WebSocketClient {
       isConnectionOpen: () => this.isOpen,
       context: {
         body: request,
-        // For security reasons, remove query params
-        url: this.url.href.split('?')[0],
+        url: this.url.toString(),
         timestamp: Date.now(),
       },
       ws: client,
@@ -205,7 +151,7 @@ export class WebSocketClient {
         if (reconnectSettings) {
           const maxRetries = reconnectSettings.retries ?? -1
           const delay = reconnectSettings.delay ?? 1000
-          const canKeepRetrying = () => {
+          const canKeepRetrying = (): boolean => {
             if (typeof maxRetries === 'number') {
               return maxRetries < 0 || this.retriesCount < maxRetries
             }

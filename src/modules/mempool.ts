@@ -1,9 +1,10 @@
-import type { HttpClient } from '../client/http'
+import type { HttpClient } from '../client/http.ts'
 import type {
   MempoolInfo,
   Transaction,
-} from '../types/'
-import { DEFAULT_OPTIONS } from '../client/http'
+} from '../types/index.ts'
+import { DEFAULT_OPTIONS } from '../client/http.ts'
+import type { RPCData } from "../types/logs.ts";
 
 export interface PushTransactionParams {
   transaction: string
@@ -29,7 +30,7 @@ export class MempoolClient {
   public pushTransaction(
     { transaction, withHighPriority }: PushTransactionParams,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<string>> {
     return this.client.call<string>({
       method: withHighPriority
         ? 'pushHighPriorityTransaction'
@@ -50,7 +51,7 @@ export class MempoolClient {
       includeTransactions: false,
     },
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<MempoolContentParams['includeTransactions'] extends true ? Transaction[] : string[]>> {
     return this.client.call<
       MempoolContentParams['includeTransactions'] extends true
         ? Transaction[]
@@ -67,7 +68,7 @@ export class MempoolClient {
    * @params options
    * @returns Mempool content in fee per byte buckets
    */
-  public mempool(options = DEFAULT_OPTIONS) {
+  public mempool(options = DEFAULT_OPTIONS): Promise<Error | RPCData<MempoolInfo>> {
     return this.client.call<MempoolInfo>({ method: 'mempool' }, options)
   }
 
@@ -77,8 +78,8 @@ export class MempoolClient {
    * @params options
    * @returns Minimum fee per byte
    */
-  public getMinFeePerByte(options = DEFAULT_OPTIONS) {
-    return this.client.call</* f64 */ number>(
+  public getMinFeePerByte(options = DEFAULT_OPTIONS): Promise<Error | RPCData<number>> {
+    return this.client.call<number>(
       { method: 'getMinFeePerByte' },
       options,
     )
@@ -91,7 +92,7 @@ export class MempoolClient {
   public getTransactionFromMempool(
     hash: string,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<Transaction>> {
     return this.client.call<Transaction>({
       method: 'getTransactionFromMempool',
       params: [hash],

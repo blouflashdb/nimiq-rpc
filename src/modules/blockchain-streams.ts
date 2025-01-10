@@ -1,14 +1,14 @@
-import type { FilterStreamFn, StreamOptions, Subscription, WebSocketClient } from '../client/web-socket'
-import type { Block, BlockchainState, LogType, MacroBlock, MicroBlock, Validator } from '../types/'
-import type { BlockLog } from '../types/logs'
-import { WS_DEFAULT_OPTIONS } from '../client/web-socket'
-import { BlockSubscriptionType, RetrieveType } from '../types/'
+import type { FilterStreamFn, StreamOptions, Subscription, WebSocketClient } from '../client/web-socket.ts'
+import type { Block, BlockchainState, LogType, MacroBlock, MicroBlock, Validator } from '../types/index.ts'
+import type { BlockLog } from '../types/logs.ts'
+import { WS_DEFAULT_OPTIONS } from '../client/web-socket.ts'
+import { BlockSubscriptionType, RetrieveType } from '../types/index.ts'
 
 export interface BlockParams { retrieve?: RetrieveType.Full | RetrieveType.Partial }
-export interface ValidatorElectionParams { address: string, withMetadata?: boolean }
-export interface LogsParams { addresses?: string[], types?: LogType[], withMetadata?: boolean }
+export interface ValidatorElectionParams { address: string }
+export interface LogsParams { addresses?: string[], types?: LogType[] }
 
-function getBlockType(block: any): BlockSubscriptionType {
+function getBlockType(block: Block): BlockSubscriptionType {
   if (!block)
     throw new Error('Block is undefined')
   if (!('isElectionBlock' in block))
@@ -31,7 +31,7 @@ export class BlockchainStream {
   /**
    * Subscribes to block hash events.
    */
-  public async subscribeForBlockHashes<T = string, M = undefined>(
+  public subscribeForBlockHashes<T = string, M = undefined>(
     userOptions?: Partial<StreamOptions>,
   ): Promise<Subscription<T, M>> {
     const options: StreamOptions = { ...WS_DEFAULT_OPTIONS, ...userOptions as StreamOptions }
@@ -41,7 +41,7 @@ export class BlockchainStream {
   /**
    * Subscribes to election blocks.
    */
-  public async subscribeForElectionBlocks<T = Block, M = undefined>(
+  public subscribeForElectionBlocks<T = Block, M = undefined>(
     params: BlockParams = {},
     userOptions?: Partial<StreamOptions>,
   ): Promise<Subscription<T, M>> {
@@ -53,7 +53,7 @@ export class BlockchainStream {
   /**
    * Subscribes to micro blocks.
    */
-  public async subscribeForMicroBlocks<T = MicroBlock, M = undefined>(
+  public subscribeForMicroBlocks<T = MicroBlock, M = undefined>(
     params: BlockParams = {},
     userOptions?: Partial<StreamOptions>,
   ): Promise<Subscription<T, M>> {
@@ -65,7 +65,7 @@ export class BlockchainStream {
   /**
    * Subscribes to macro blocks.
    */
-  public async subscribeForMacroBlocks<T = MacroBlock, M = undefined>(
+  public subscribeForMacroBlocks<T = MacroBlock, M = undefined>(
     params: BlockParams = {},
     userOptions?: Partial<StreamOptions>,
   ): Promise<Subscription<T, M>> {
@@ -77,7 +77,7 @@ export class BlockchainStream {
   /**
    * Subscribes to all blocks.
    */
-  public async subscribeForBlocks<T = Block, M = undefined>(
+  public subscribeForBlocks<T = Block, M = undefined>(
     params: BlockParams = {},
     userOptions?: Partial<StreamOptions>,
   ): Promise<Subscription<T, M>> {
@@ -88,7 +88,7 @@ export class BlockchainStream {
   /**
    * Subscribes to pre epoch validators events.
    */
-  public async subscribeForValidatorElectionByAddress<T = Validator, M = BlockchainState>(
+  public subscribeForValidatorElectionByAddress<T = Validator, M = BlockchainState>(
     params: ValidatorElectionParams,
     userOptions?: Partial<StreamOptions>,
   ): Promise<Subscription<T, M>> {
@@ -98,16 +98,11 @@ export class BlockchainStream {
   /**
    * Subscribes to log events related to a given list of addresses and log types.
    */
-  public async subscribeForLogsByAddressesAndTypes<T = BlockLog, M = BlockchainState>(
+  public subscribeForLogsByAddressesAndTypes<T = BlockLog, M = BlockchainState>(
     params: LogsParams = {},
     userOptions?: Partial<StreamOptions>,
   ): Promise<Subscription<T, M>> {
     const { addresses = [], types = [] } = params
     return this.ws.subscribe<T, M>({ method: 'subscribeForLogsByAddressesAndTypes', params: [addresses, types] }, { ...WS_DEFAULT_OPTIONS, ...userOptions })
   }
-
-  // TODO: the server does not support this method yet
-  // public async unsubscribe(subscription: number): Promise<void> {
-  //   return this.ws.unsubscribe(subscription)
-  // }
 }

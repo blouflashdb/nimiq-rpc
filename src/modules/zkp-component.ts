@@ -1,5 +1,6 @@
-import type { HttpClient } from '../client/http'
-import { DEFAULT_OPTIONS } from '../client/http'
+import type { HttpClient } from '../client/http.ts'
+import { DEFAULT_OPTIONS } from '../client/http.ts'
+import type { RPCData } from "../types/logs.ts";
 
 interface ZKPStateKebab {
   'latest-header-number': string
@@ -18,22 +19,7 @@ export class ZkpComponentClient {
    * Returns the latest header number, block number and proof
    * @returns the latest header number, block number and proof
    */
-  public async getZkpState(options = DEFAULT_OPTIONS) {
-    const { data, error, context, metadata } = await this.client.call<ZKPStateKebab>({ method: 'getZkpState' }, options)
-    if (error) {
-      return { error, data, context }
-    }
-    else {
-      return {
-        error,
-        data: {
-          latestHeaderNumber: data!['latest-header-number'],
-          latestBlockNumber: data!['latest-block-number'],
-          latestProof: data!['latest-proof'],
-        },
-        context,
-        metadata,
-      }
-    }
+  public getZkpState(options = DEFAULT_OPTIONS): Promise<Error | RPCData<ZKPStateKebab>> {
+    return this.client.call<ZKPStateKebab>({ method: 'getZkpState' }, options)
   }
 }

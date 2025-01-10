@@ -276,11 +276,6 @@ export interface BlockchainState {
   blockHash: string
 }
 
-export interface Auth {
-  username: string
-  password: string
-}
-
 export enum BlockType {
   Micro = 'micro',
   Macro = 'macro',
