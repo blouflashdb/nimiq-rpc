@@ -1,7 +1,10 @@
-import type { Auth } from '../types/'
+import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
+import type { IJSONRPCResponse } from '@open-rpc/client-js/build/Request'
+import type { RPCData } from '../types/'
+import Client, { HTTPTransport, JSONRPCError, RequestManager } from '@open-rpc/client-js'
 
 export interface HttpOptions {
-  timeout?: number | false // in ms
+  timeout?: number // in ms
 }
 
 export type SendTxCallOptions = HttpOptions & ({
@@ -18,146 +21,36 @@ export const DEFAULT_OPTIONS_SEND_TX: SendTxCallOptions = {
   timeout: DEFAULT_TIMEOUT_CONFIRMATION,
 }
 
-export interface Context {
-  headers: HeadersInit
-  body: {
-    method: string
-    params: any[]
-    id: number
-    jsonrpc: string
-  }
-  timestamp: number
-  url: string
-}
-
-export type CallResult<Data, Metadata = undefined> = {
-  context: Context
-} & (
-  | {
-    data: Data
-    metadata: Metadata
-    error: undefined
-  }
-  | {
-    data: undefined
-    metadata: undefined
-    error: {
-      code: number
-      message: string
-    }
-  }
-)
-
 export class HttpClient {
-  private url: URL
-  private static id: number = 0
-  private headers: HeadersInit = { 'Content-Type': 'application/json', 'Authorization': '' }
+  private client: Client
 
-  constructor(url: URL | string, auth?: Auth) {
-    if (!url)
-      throw new Error('URL is required')
+  constructor(url: string) {
+    const transport = new HTTPTransport(url, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
 
-    this.url = typeof url === 'string' ? new URL(url) : url
-
-    if (auth?.username && auth.password) {
-      const authorization = btoa(`${auth.username}:${auth.password}`)
-      Object.assign(this.headers, { Authorization: `Basic ${authorization}` })
-    }
+    this.client = new Client(new RequestManager([transport]))
   }
 
   async call<
     Data,
     Metadata = undefined,
   >(
-    request: { method: string, params?: any[], withMetadata?: boolean },
-        options: HttpOptions = DEFAULT_OPTIONS,
-  ): Promise<CallResult<Data, Metadata>> {
-    const { method, params: requestParams, withMetadata } = request
-    const { timeout } = options
-
-    let controller: AbortController | undefined
-    let timeoutId: any | undefined
-
-    if (timeout !== false) {
-      controller = new AbortController()
-      timeoutId = setTimeout(() => controller!.abort(), timeout)
+    request: RequestArguments,
+    options: HttpOptions,
+  ): Promise<RPCData<Data, Metadata> | Error> {
+    try {
+      const result = await this.client.request(request, options.timeout)
+      const data = result as IJSONRPCResponse
+      return data.result as RPCData<Data, Metadata>
     }
-
-    const params = requestParams?.map(item => item === undefined ? null : item) || []
-
-    const context: Context = {
-      body: {
-        method,
-        params,
-        jsonrpc: '2.0',
-        id: HttpClient.id++,
-      },
-      headers: this.headers,
-      url: this.url.href,
-      timestamp: Date.now(),
-    }
-
-    const response = await fetch(context.url, {
-      method: 'POST',
-      headers: context.headers,
-      body: JSON.stringify(context.body),
-      signal: controller?.signal,
-    }).catch((error) => {
-      if (error.name === 'AbortError')
-        return { ok: false, status: 408, statusText: `AbortError: Service Unavailable: ${error.message}` } as Response
-      else if (error.name === 'FetchError')
-        return { ok: false, status: 503, statusText: `FetchError: Service Unavailable: ${error.message} ` } as Response
-      else
-        return { ok: false, status: 503, statusText: `Service Unavailable: ${error.message} ` } as Response
-    })
-
-    clearTimeout(timeoutId)
-
-    if (!response.ok) {
-      return {
-        context,
-        data: undefined,
-        metadata: undefined,
-        error: {
-          code: response.status,
-          message: response.status === 401
-            ? 'Server requires authorization.'
-            : `Response status code not OK: ${response.status} ${response.statusText} `,
-        },
+    catch (error: unknown) {
+      if (error instanceof JSONRPCError) {
+        return new Error(error.message)
       }
-    }
-
-    const json = await response.json() as any
-
-    if ('result' in json) {
-      return {
-        context,
-        data: json.result.data,
-        metadata: withMetadata ? json.result.metadata : undefined,
-        error: undefined,
-      }
-    }
-
-    if ('error' in json) {
-      return {
-        context,
-        data: undefined,
-        metadata: undefined,
-        error: {
-          code: json.error.code,
-          message: `${json.error.message}: ${json.error.data} `,
-        },
-      }
-    }
-
-    return {
-      context,
-      data: undefined,
-      metadata: undefined,
-      error: {
-        code: -1,
-        message: `Unexpected format of data ${JSON.stringify(json)} `,
-      },
+      return new Error('Unknown error')
     }
   }
 }

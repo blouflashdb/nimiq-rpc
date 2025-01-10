@@ -1,7 +1,7 @@
 import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
-import type { CallResult, HttpOptions } from './client/http'
+import type { HttpOptions } from './client/http'
 import type { StreamOptions, Subscription } from './client/web-socket'
-import type { Auth } from './types/'
+import type { RPCData } from './types/logs'
 import { DEFAULT_OPTIONS, HttpClient } from './client/http'
 import { WebSocketClient } from './client/web-socket'
 import * as Modules from './modules'
@@ -21,11 +21,10 @@ export class NimiqRPCClient {
   public zkpComponent
 
   /**
-   * @param url Node URL [?secret=secret]
-   * @param auth { username, password }
+   * @param url Node URL
    */
-  constructor(url: URL | string, auth?: Auth) {
-    this.http = new HttpClient(url, auth)
+  constructor(url: string) {
+    this.http = new HttpClient(url)
     this.ws = new WebSocketClient(url)
 
     this.blockchain = new Modules.BlockchainClient.BlockchainClient(this.http)
@@ -34,8 +33,6 @@ export class NimiqRPCClient {
     )
     this.consensus = new Modules.ConsensusClient.ConsensusClient(
       this.http,
-      this.blockchain,
-      this.blockchainStreams,
     )
     this.mempool = new Modules.MempoolClient.MempoolClient(this.http)
     this.network = new Modules.NetworkClient.NetworkClient(this.http)
@@ -51,14 +48,13 @@ export class NimiqRPCClient {
    * @param request - The request object containing the following properties:
    * @param request.method - The name of the method to call.
    * @param request.params - The parameters to pass with the call, if any.
-   * @param request.withMetadata - Flag indicating whether metadata should be included in the response.
    * @param options - The HTTP options for the call. Defaults to DEFAULT_OPTIONS if not provided.
    * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   async call<Data, Metadata = undefined>(
-    request: { method: string, params?: any[], withMetadata?: boolean },
+    request: RequestArguments,
     options: HttpOptions = DEFAULT_OPTIONS,
-  ): Promise<CallResult<Data, Metadata>> {
+  ): Promise<RPCData<Data, Metadata> | Error> {
     return this.http.call<Data, Metadata>(request, options)
   }
 
@@ -81,10 +77,10 @@ export class NimiqRPCClient {
 }
 
 let client: NimiqRPCClient
-export function createClient(url: URL | string, auth?: Auth): NimiqRPCClient {
+export function createClient(url: string): NimiqRPCClient {
   if (client)
     return client
-  client = new NimiqRPCClient(url, auth)
+  client = new NimiqRPCClient(url)
   return client
 }
 

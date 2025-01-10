@@ -266,7 +266,7 @@ export interface RevertedBlockLog extends BlockLog {
 
 export type BlockLogType = AppliedBlockLog | RevertedBlockLog
 
-export interface RPCData<T, M> {
+export interface RPCData<T, M = undefined> {
   data: T
   metadata: M
 }

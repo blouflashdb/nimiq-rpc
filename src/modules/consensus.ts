@@ -30,13 +30,9 @@ export interface TxLog { tx: Transaction, log?: BlockLog, hash: string }
 
 export class ConsensusClient {
   private client: HttpClient
-  private blockchainClient: BlockchainClient
-  private blockchainStream: BlockchainStream
 
-  constructor(client: HttpClient, blockchainClient: BlockchainClient, blockchainStream: BlockchainStream) {
+  constructor(client: HttpClient) {
     this.client = client
-    this.blockchainClient = blockchainClient
-    this.blockchainStream = blockchainStream
   }
 
   private getValidityStartHeight(p: ValidityStartHeight): string {
@@ -121,9 +117,7 @@ export class ConsensusClient {
    * Sends a transaction and waits for confirmation
    */
   public async sendSyncTransaction(p: TransactionParams, options: SendTxCallOptions) {
-    const hash = await this.sendTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.wallet, p.recipient], types: [LogType.Transfer] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -147,9 +141,7 @@ export class ConsensusClient {
    * Sends a transaction creating a new vesting contract to the network and waits for confirmation
    */
   public async sendSyncNewVestingTransaction(p: VestingTxParams, options: SendTxCallOptions) {
-    const hash = await this.sendNewVestingTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendNewVestingTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.wallet] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -173,9 +165,7 @@ export class ConsensusClient {
    * Sends a transaction redeeming a vesting contract and waits for confirmation
    */
   public async sendSyncRedeemVestingTransaction(p: RedeemVestingTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendRedeemVestingTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendRedeemVestingTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.wallet] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -199,9 +189,7 @@ export class ConsensusClient {
    * Sends a transaction creating a new HTLC contract and waits for confirmation
    */
   public async sendSyncNewHtlcTransaction(p: HtlcTransactionParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendNewHtlcTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendNewHtlcTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.wallet] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -225,9 +213,7 @@ export class ConsensusClient {
    * Sends a transaction redeeming a new HTLC contract and waits for confirmation
    */
   public async sendSyncRedeemRegularHtlcTransaction(p: RedeemRegularHtlcTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendRedeemRegularHtlcTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendRedeemRegularHtlcTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.wallet] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -254,9 +240,7 @@ export class ConsensusClient {
    * method to network and waits for confirmation
    */
   public async sendSyncRedeemTimeoutHtlcTransaction(p: RedeemTimeoutHtlcTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendRedeemTimeoutHtlcTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendRedeemTimeoutHtlcTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.wallet] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -283,9 +267,7 @@ export class ConsensusClient {
    * method and waits for confirmation
    */
   public async sendSyncRedeemEarlyHtlcTransaction(p: RedeemEarlyHtlcTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendRedeemEarlyHtlcTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendRedeemEarlyHtlcTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.contractAddress] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -321,9 +303,7 @@ export class ConsensusClient {
    * account (the sender wallet) to pay the transaction fee and waits for confirmation.
    */
   public async sendSyncNewStakerTransaction(p: CreateStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendNewStakerTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendNewStakerTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.senderWallet], types: [LogType.CreateStaker] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -350,9 +330,7 @@ export class ConsensusClient {
    * be paid from the `sender_wallet` and waits for confirmation.
    */
   public async sendSyncStakeTransaction(p: StakeTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendStakeTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendStakeTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.senderWallet], types: [LogType.Stake] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -382,9 +360,7 @@ export class ConsensusClient {
    * providing a sender wallet) and waits for confirmation.
    */
   public async sendSyncUpdateStakerTransaction(p: UpdateStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendUpdateStakerTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendUpdateStakerTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.senderWallet], types: [LogType.UpdateStaker] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -414,9 +390,7 @@ export class ConsensusClient {
    * providing a sender wallet) and waits for confirmation.
    */
   public async sendSyncSetActiveStakeTransaction(p: SetActiveStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendSetActiveStakeTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendSetActiveStakeTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.senderWallet], types: [LogType.SetActiveStake] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -446,9 +420,7 @@ export class ConsensusClient {
    * providing a sender wallet) and waits for confirmation.
    */
   public async sendSyncRetireStakeTransaction(p: CreateRetireStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendRetireStakeTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendRetireStakeTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.senderWallet], types: [LogType.RetireStake] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -472,9 +444,7 @@ export class ConsensusClient {
    * Sends a `remove_stake` transaction and waits for confirmation.
    */
   public async sendSyncRemoveStakeTransaction(p: RemoveStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendRemoveStakeTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendRemoveStakeTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.stakerWallet], types: [LogType.RemoveStake] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -514,9 +484,7 @@ export class ConsensusClient {
    * "0x29a4b..." = Set the signal data field to Some(0x29a4b...).
    */
   public async sendSyncNewValidatorTransaction(p: NewValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendNewValidatorTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendNewValidatorTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.senderWallet], types: [LogType.CreateValidator] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -558,9 +526,7 @@ export class ConsensusClient {
    * "0x29a4b..." = Change the signal data field to Some(0x29a4b...).
    */
   public async sendSyncUpdateValidatorTransaction(p: UpdateValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendUpdateValidatorTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendUpdateValidatorTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.validator], types: [LogType.UpdateValidator] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -588,9 +554,7 @@ export class ConsensusClient {
    * to pay the transaction fee.
    */
   public async sendSyncDeactivateValidatorTransaction(p: DeactiveValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendDeactivateValidatorTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendDeactivateValidatorTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.validator], types: [LogType.DeactivateValidator] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -618,9 +582,7 @@ export class ConsensusClient {
    * to pay the transaction fee.
    */
   public async sendSyncReactivateValidatorTransaction(p: ReactivateValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendReactivateValidatorTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendReactivateValidatorTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.validator], types: [LogType.ReactivateValidator] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -648,9 +610,7 @@ export class ConsensusClient {
    * to pay the transaction fee.
    */
   public async sendSyncRetireValidatorTransaction(p: RetireValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendRetireValidatorTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendRetireValidatorTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.validator], types: [LogType.RetireValidator] }, options.waitForConfirmationTimeout, hash.context)
   }
 
@@ -683,9 +643,7 @@ export class ConsensusClient {
    * Failed delete validator transactions can diminish the validator deposit
    */
   public async sendSyncDeleteValidatorTransaction(p: DeleteValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
-    const hash = await this.sendDeleteValidatorTransaction(p, options)
-    if (hash.error)
-      return hash
+    return await this.sendDeleteValidatorTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.validator], types: [LogType.DeleteValidator] }, options.waitForConfirmationTimeout, hash.context)
   }
 }

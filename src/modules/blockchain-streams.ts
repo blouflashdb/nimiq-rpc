@@ -5,8 +5,8 @@ import { WS_DEFAULT_OPTIONS } from '../client/web-socket'
 import { BlockSubscriptionType, RetrieveType } from '../types/'
 
 export interface BlockParams { retrieve?: RetrieveType.Full | RetrieveType.Partial }
-export interface ValidatorElectionParams { address: string, withMetadata?: boolean }
-export interface LogsParams { addresses?: string[], types?: LogType[], withMetadata?: boolean }
+export interface ValidatorElectionParams { address: string }
+export interface LogsParams { addresses?: string[], types?: LogType[] }
 
 function getBlockType(block: any): BlockSubscriptionType {
   if (!block)

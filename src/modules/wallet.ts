@@ -1,5 +1,5 @@
 import type { HttpClient } from '../client/http'
-import type { Signature, WalletAccount } from '../types/'
+import type { RPCData, Signature, WalletAccount } from '../types/'
 import { DEFAULT_OPTIONS } from '../client/http'
 
 export interface ImportKeyParams { keyData: string, passphrase?: string }
@@ -15,43 +15,43 @@ export class WalletClient {
     this.client = http
   }
 
-  public async importRawKey({ keyData, passphrase }: ImportKeyParams, options = DEFAULT_OPTIONS) {
-    return this.client.call<string>({ method: 'importRawKey', params: [keyData, passphrase] }, options)
+  public async importRawKey<T = string>({ keyData, passphrase }: ImportKeyParams, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T, undefined>> {
+    return this.client.call<T>({ method: 'importRawKey', params: [keyData, passphrase] }, options)
   }
 
-  public async isAccountImported(address: string, options = DEFAULT_OPTIONS) {
-    return this.client.call<boolean>({ method: 'isAccountImported', params: [address] }, options)
+  public async isAccountImported<T = string>(address: string, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'isAccountImported', params: [address] }, options)
   }
 
-  public async listAccounts(options = DEFAULT_OPTIONS) {
-    return this.client.call<string[]>({ method: 'listAccounts' }, options)
+  public async listAccounts<T = string[]>(options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'listAccounts' }, options)
   }
 
-  public async lockAccount(address: string, options = DEFAULT_OPTIONS) {
-    return this.client.call<null>({ method: 'lockAccount', params: [address] }, options)
+  public async lockAccount<T = null>(address: string, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'lockAccount', params: [address] }, options)
   }
 
-  public async createAccount(p?: CreateAccountParams, options = DEFAULT_OPTIONS) {
-    return this.client.call<WalletAccount>({ method: 'createAccount', params: [p?.passphrase] }, options)
+  public async createAccount<T = WalletAccount>(p?: CreateAccountParams, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'createAccount', params: [p?.passphrase] }, options)
   }
 
-  public async unlockAccount(address: string, { passphrase, duration }: UnlockAccountParams, options = DEFAULT_OPTIONS) {
-    return this.client.call<boolean>({ method: 'unlockAccount', params: [address, passphrase, duration] }, options)
+  public async unlockAccount<T = boolean>(address: string, { passphrase, duration }: UnlockAccountParams, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'unlockAccount', params: [address, passphrase, duration] }, options)
   }
 
-  public async isAccountUnlocked(address: string, options = DEFAULT_OPTIONS) {
-    return this.client.call<boolean>({ method: 'isAccountUnlocked', params: [address] }, options)
+  public async isAccountUnlocked<T = boolean>(address: string, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'isAccountUnlocked', params: [address] }, options)
   }
 
-  public async sign({ message, address, passphrase, isHex }: SignParams, options = DEFAULT_OPTIONS) {
-    return this.client.call<Signature>({ method: 'sign', params: [message, address, passphrase, isHex] }, options)
+  public async sign<T = Signature>({ message, address, passphrase, isHex }: SignParams, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'sign', params: [message, address, passphrase, isHex] }, options)
   }
 
-  public async verifySignature({ message, publicKey, signature, isHex }: VerifySignatureParams, options = DEFAULT_OPTIONS) {
-    return this.client.call<boolean>({ method: 'verifySignature', params: [message, publicKey, signature, isHex] }, options)
+  public async verifySignature<T = boolean>({ message, publicKey, signature, isHex }: VerifySignatureParams, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'verifySignature', params: [message, publicKey, signature, isHex] }, options)
   }
 
-  public async removeAccount(address: string, options = DEFAULT_OPTIONS) {
-    return this.client.call<boolean>({ method: 'removeAccount', params: [address] }, options)
+  public async removeAccount<T = boolean>(address: string, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'removeAccount', params: [address] }, options)
   }
 }

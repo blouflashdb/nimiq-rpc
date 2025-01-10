@@ -59,11 +59,8 @@ export class WebSocketClient {
   private retriesCount = 0
   private reconnectTimer?: ReturnType<typeof setTimeout>
 
-  constructor(url: URL | string) {
-    if (typeof url === 'string') {
-      url = new URL(url)
-    }
-    const wsUrl = new URL(url.href.replace(/^http/, 'ws'))
+  constructor(url: string) {
+    const wsUrl = new URL(url.replace(/^http/, 'ws'))
     wsUrl.pathname = '/ws'
     this.url = wsUrl
   }

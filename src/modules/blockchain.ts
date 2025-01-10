@@ -7,6 +7,7 @@ import type {
   LogType,
   PartialBlock,
   PenalizedSlots,
+  RPCData,
   Slot,
   Staker,
   Transaction,
@@ -19,14 +20,12 @@ export interface GetBlockByBlockNumberParams { includeBody?: boolean }
 export interface GetLatestBlockParams { includeBody?: boolean }
 export interface GetSlotAtBlockParams {
   offsetOpt?: number
-  withMetadata?: boolean
 }
 export interface GetTransactionsByAddressParams {
   max: number
   startAt: string
   justHashes?: boolean
 }
-export interface GetAccountByAddressParams { withMetadata?: boolean }
 export interface GetValidatorByAddressParams { address: string }
 export interface GetStakersByAddressParams { address: string }
 export interface GetStakerByAddressParams { address: string }
@@ -47,22 +46,22 @@ export class BlockchainClient {
   /**
    * Returns the block number for the current head.
    */
-  public async getBlockNumber(options = DEFAULT_OPTIONS) {
-    return this.client.call<number>({ method: 'getBlockNumber' }, options)
+  public async getBlockNumber<T = number>(options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'getBlockNumber' }, options)
   }
 
   /**
    * Returns the batch number for the current head.
    */
-  public async getBatchNumber(options = DEFAULT_OPTIONS) {
-    return this.client.call<number>({ method: 'getBatchNumber' }, options)
+  public async getBatchNumber<T = number>(options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'getBatchNumber' }, options)
   }
 
   /**
    * Returns the epoch number for the current head.
    */
-  public async getEpochNumber(options = DEFAULT_OPTIONS) {
-    return this.client.call<number>({ method: 'getEpochNumber' }, options)
+  public async getEpochNumber<T = number>(options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+    return this.client.call<T>({ method: 'getEpochNumber' }, options)
   }
 
   /**
@@ -72,7 +71,7 @@ export class BlockchainClient {
     hash: string,
     p?: T,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<T['includeBody'] extends true ? Block : PartialBlock>> {
     return this.client.call<
       T['includeBody'] extends true ? Block : PartialBlock
     >(
@@ -124,7 +123,6 @@ export class BlockchainClient {
     return this.client.call<Slot>({
       method: 'getSlotAt',
       params: [blockNumber, p?.offsetOpt],
-      withMetadata: p?.withMetadata,
     }, options)
   }
 
@@ -221,19 +219,17 @@ export class BlockchainClient {
   /**
    * Tries to fetch the account at the given address.
    */
-  public async getAccountByAddress<T extends { withMetadata?: boolean }>(
+  public async getAccountByAddress(
     address: string,
-    { withMetadata }: T,
     options = DEFAULT_OPTIONS,
   ) {
     const req = {
       method: 'getAccountByAddress',
       params: [address],
-      withMetadata,
     }
     return this.client.call<
       Account,
-      T['withMetadata'] extends true ? BlockchainState : undefined
+      BlockchainState
     >(req, options)
   }
 
@@ -251,35 +247,29 @@ export class BlockchainClient {
   /**
    * Returns a collection of the currently active validator's addresses and balances.
    */
-  public async getActiveValidators<T extends { withMetadata?: boolean }>(
-    { withMetadata }: T = { withMetadata: false } as T,
+  public async getActiveValidators(
     options = DEFAULT_OPTIONS,
   ) {
-    const req = { method: 'getActiveValidators', withMetadata }
+    const req = { method: 'getActiveValidators' }
     return this.client.call<
-      Validator[],
-      T['withMetadata'] extends true ? BlockchainState : undefined
+      Validator[]
     >(req, options)
   }
 
-  public async getCurrentPenalizedSlots<T extends { withMetadata?: boolean }>(
-    { withMetadata }: T = { withMetadata: false } as T,
+  public async getCurrentPenalizedSlots(
     options = DEFAULT_OPTIONS,
   ) {
     return this.client.call<PenalizedSlots[]>({
       method: 'getCurrentPenalizedSlots',
-      withMetadata,
     }, options)
   }
 
-  public async getPreviousPenalizedSlots<T extends { withMetadata?: boolean }>(
-    { withMetadata }: T = { withMetadata: false } as T,
+  public async getPreviousPenalizedSlots(
     options = DEFAULT_OPTIONS,
   ) {
-    const req = { method: 'getPreviousPenalizedSlots', withMetadata }
+    const req = { method: 'getPreviousPenalizedSlots' }
     return this.client.call<
-      PenalizedSlots[],
-      T['withMetadata'] extends true ? BlockchainState : undefined
+      PenalizedSlots[]
     >(req, options)
   }
 
