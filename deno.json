@@ -1,4 +1,8 @@
 {
+  "name": "@blouflash/nimiq-rpc",
+  "version": "1.0.1",
+  "license": "MIT",
+  "exports": "./main.ts",
   "imports": {
     "@open-rpc/client-js": "npm:@open-rpc/client-js@^1.8.1",
     "@types/node": "npm:@types/node@^22.10.5",
