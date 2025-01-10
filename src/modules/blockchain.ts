@@ -256,6 +256,9 @@ export class BlockchainClient {
     >(req, options)
   }
 
+  /**
+   * Returns the currently penalized slots.
+   */
   public getCurrentPenalizedSlots(
     options = DEFAULT_OPTIONS,
   ): Promise<Error | RPCData<PenalizedSlots[]>> {
@@ -264,6 +267,9 @@ export class BlockchainClient {
     }, options)
   }
 
+  /**
+   * Returns the previously penalized slots.
+   */
   public getPreviousPenalizedSlots(
     options = DEFAULT_OPTIONS,
   ): Promise<Error | RPCData<PenalizedSlots[]>> {
