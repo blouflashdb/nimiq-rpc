@@ -1,9 +1,9 @@
-import type { HttpClient } from '../client/http'
+import type { HttpClient } from '../client/http.ts'
 import type {
   MempoolInfo,
   Transaction,
-} from '../types/'
-import { DEFAULT_OPTIONS } from '../client/http'
+} from '../types/index.ts'
+import { DEFAULT_OPTIONS } from '../client/http.ts'
 
 export interface PushTransactionParams {
   transaction: string

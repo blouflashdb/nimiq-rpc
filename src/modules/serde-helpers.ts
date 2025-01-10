@@ -1,5 +1,5 @@
-import type { HttpClient } from '../client/http'
-import { DEFAULT_OPTIONS } from '../client/http'
+import type { HttpClient } from '../client/http.ts'
+import { DEFAULT_OPTIONS } from '../client/http.ts'
 
 export interface HexSerializationParams {
   data: Uint8Array
@@ -25,7 +25,7 @@ export class SerdeHelper {
    * @param options - Optional settings for the request.
    * @returns The serialized hexadecimal string.
    */
-  public async serializeToHex(
+  public serializeToHex(
     { data }: HexSerializationParams,
     options = DEFAULT_OPTIONS,
   ) {
@@ -44,7 +44,7 @@ export class SerdeHelper {
    * @param options - Optional settings for the request.
    * @returns The deserialized byte array.
    */
-  public async deserializeFromHex(
+  public deserializeFromHex(
     { hexString }: HexDeserializationParams,
     options = DEFAULT_OPTIONS,
   ) {

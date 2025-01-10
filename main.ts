@@ -1,10 +1,10 @@
 import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
-import type { HttpOptions } from './client/http'
-import type { StreamOptions, Subscription } from './client/web-socket'
-import type { RPCData } from './types/logs'
-import { DEFAULT_OPTIONS, HttpClient } from './client/http'
-import { WebSocketClient } from './client/web-socket'
-import * as Modules from './modules'
+import type { HttpOptions } from './src/client/http.ts'
+import type { StreamOptions, Subscription } from './src/client/web-socket.ts'
+import type { RPCData } from './src/types/logs.ts'
+import { DEFAULT_OPTIONS, HttpClient } from './src/client/http.ts'
+import { WebSocketClient } from './src/client/web-socket.ts'
+import * as Modules from './src/modules/index.ts'
 
 export class NimiqRPCClient {
   public http: HttpClient
@@ -51,7 +51,7 @@ export class NimiqRPCClient {
    * @param options - The HTTP options for the call. Defaults to DEFAULT_OPTIONS if not provided.
    * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
-  async call<Data, Metadata = undefined>(
+  call<Data, Metadata = undefined>(
     request: RequestArguments,
     options: HttpOptions = DEFAULT_OPTIONS,
   ): Promise<RPCData<Data, Metadata> | Error> {
@@ -65,7 +65,7 @@ export class NimiqRPCClient {
    * @param userOptions
    * @returns A promise that resolves with a Subscription object.
    */
-  async subscribe<
+  subscribe<
     Data,
     Metadata,
   >(
@@ -84,8 +84,8 @@ export function createClient(url: string): NimiqRPCClient {
   return client
 }
 
-export * from './client/http'
-export * from './client/web-socket'
-export * from './modules'
-export * from './types/'
-export * from './types/logs'
+export * from './src/client/http.ts'
+export * from './src/client/web-socket.ts'
+export * from './src/modules/index.ts'
+export * from './src/types/index.ts'
+export * from './src/types/logs.ts'

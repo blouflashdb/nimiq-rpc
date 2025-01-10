@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@open-rpc/client-js": "npm:@open-rpc/client-js@^1.8.1",
+    "@types/node": "npm:@types/node@^22.10.5",
+    "@types/ws": "npm:@types/ws@^8.5.13"
+  }
+}

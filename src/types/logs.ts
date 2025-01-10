@@ -1,4 +1,4 @@
-import type { BlockchainState } from './common'
+import type { BlockchainState } from './common.ts'
 
 export enum LogType {
   PayFee = 'pay-fee',

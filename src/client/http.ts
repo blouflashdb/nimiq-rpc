@@ -1,7 +1,7 @@
 import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
 import type { IJSONRPCResponse } from '@open-rpc/client-js/build/Request'
-import type { RPCData } from '../types/'
-import Client, { HTTPTransport, JSONRPCError, RequestManager } from '@open-rpc/client-js'
+import type { RPCData } from '../types/index.ts'
+import { Client, HTTPTransport, JSONRPCError, RequestManager } from '@open-rpc/client-js'
 
 export interface HttpOptions {
   timeout?: number // in ms

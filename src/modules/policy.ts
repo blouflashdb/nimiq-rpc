@@ -1,8 +1,8 @@
-import type { HttpClient } from '../client/http'
+import type { HttpClient } from '../client/http.ts'
 import type {
   PolicyConstants,
-} from '../types/'
-import { DEFAULT_OPTIONS } from '../client/http'
+} from '../types/index.ts'
+import { DEFAULT_OPTIONS } from '../client/http.ts'
 
 export interface SupplyAtParams {
   genesisSupply: number
@@ -24,7 +24,7 @@ export class PolicyClient {
    *
    * @param options
    */
-  public async getPolicyConstants(options = DEFAULT_OPTIONS) {
+  public getPolicyConstants(options = DEFAULT_OPTIONS) {
     return this.client.call<PolicyConstants>(
       { method: 'getPolicyConstants' },
       options,
@@ -39,7 +39,7 @@ export class PolicyClient {
    * @param blockNumber
    * @param options
    */
-  public async getEpochAt(blockNumber: number, options = DEFAULT_OPTIONS) {
+  public getEpochAt(blockNumber: number, options = DEFAULT_OPTIONS) {
     return this.client.call<number>({
       method: 'getEpochAt',
       params: [blockNumber],
@@ -56,7 +56,7 @@ export class PolicyClient {
    * @param options
    * @returns The epoch index at a given block number.
    */
-  public async getEpochIndexAt(
+  public getEpochIndexAt(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -75,7 +75,7 @@ export class PolicyClient {
    * @param options
    * @returns The batch number at a given `block_number` (height)
    */
-  public async getBatchAt(blockNumber: number, options = DEFAULT_OPTIONS) {
+  public getBatchAt(blockNumber: number, options = DEFAULT_OPTIONS) {
     return this.client.call<number>({
       method: 'getBatchAt',
       params: [blockNumber],
@@ -92,7 +92,7 @@ export class PolicyClient {
    * @param options
    * @returns The batch index at a given block number.
    */
-  public async getBatchIndexAt(
+  public getBatchIndexAt(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -110,7 +110,7 @@ export class PolicyClient {
    * @param blockNumber
    * @returns The number (height) of the next election macro block after a given block number (height).
    */
-  public async getElectionBlockAfter(
+  public getElectionBlockAfter(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -130,7 +130,7 @@ export class PolicyClient {
    * @param options
    * @returns The block number (height) of the preceding election macro block before a given block number (height).
    */
-  public async getElectionBlockBefore(
+  public getElectionBlockBefore(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -150,7 +150,7 @@ export class PolicyClient {
    * @param options
    * @returns The block number (height) of the last election macro block at a given block number (height).
    */
-  public async getLastElectionBlock(
+  public getLastElectionBlock(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -169,7 +169,7 @@ export class PolicyClient {
    * @parm options
    * @returns A boolean expressing if the block at a given block number (height) is an election macro block.
    */
-  public async isElectionBlockAt(
+  public isElectionBlockAt(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -187,7 +187,7 @@ export class PolicyClient {
    * @param blockNumber The block number (height) to query.
    * @returns The block number (height) of the next macro block after a given block number (height).
    */
-  public async getMacroBlockAfter(
+  public getMacroBlockAfter(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -205,7 +205,7 @@ export class PolicyClient {
    * @param blockNumber The block number (height) to query.
    * @returns The block number (height) of the preceding macro block before a given block number (height).
    */
-  public async getMacroBlockBefore(
+  public getMacroBlockBefore(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -224,7 +224,7 @@ export class PolicyClient {
    * @param blockNumber The block number (height) to query.
    * @returns The block number (height) of the last macro block at a given block number (height).
    */
-  public async getLastMacroBlock(
+  public getLastMacroBlock(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -242,7 +242,7 @@ export class PolicyClient {
    * @param blockNumber The block number (height) to query.
    * @returns A boolean expressing if the block at a given block number (height) is a macro block.
    */
-  public async isMacroBlockAt(
+  public isMacroBlockAt(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -261,7 +261,7 @@ export class PolicyClient {
    * @param options
    * @returns The block number (height) of the next micro block after a given block number (height).
    */
-  public async isMicroBlockAt(
+  public isMicroBlockAt(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -278,7 +278,7 @@ export class PolicyClient {
    * @param options
    * @returns The block number (height) of the first block of the given epoch (which is always a micro block).
    */
-  public async getFirstBlockOfEpoch(
+  public getFirstBlockOfEpoch(
     epochIndex: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -294,7 +294,7 @@ export class PolicyClient {
    * @param blockNumber
    * @returns The block number of the first block of the given reporting window (which is always a micro block).
    */
-  public async getBlockAfterReportingWindow(
+  public getBlockAfterReportingWindow(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -310,7 +310,7 @@ export class PolicyClient {
    * @param blockNumber
    * @returns The block number of the first block of the given jail (which is always a micro block).
    */
-  public async getBlockAfterJail(
+  public getBlockAfterJail(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -327,7 +327,7 @@ export class PolicyClient {
    * @param options
    * @returns The block number of the first block of the given batch (which is always a micro block).
    */
-  public async getFirstBlockOfBatch(
+  public getFirstBlockOfBatch(
     batchIndex: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -344,7 +344,7 @@ export class PolicyClient {
    * @param options
    * @returns The block number of the election macro block of the given epoch (which is always the last block).
    */
-  public async getElectionBlockOfEpoch(
+  public getElectionBlockOfEpoch(
     epochIndex: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -361,7 +361,7 @@ export class PolicyClient {
    * @param options
    * @returns The block number of the macro block (checkpoint or election) of the given batch (which is always the last block).
    */
-  public async getMacroBlockOfBatch(
+  public getMacroBlockOfBatch(
     batchIndex: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -379,7 +379,7 @@ export class PolicyClient {
    * @param options
    * @returns A boolean expressing if the batch at a given block number (height) is the first batch
    */
-  public async getFirstBatchOfEpoch(
+  public getFirstBatchOfEpoch(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
   ) {
@@ -402,7 +402,7 @@ export class PolicyClient {
    * @param params.currentTime timestamp to calculate supply at
    * @returns The supply at a given time (as Unix time) in Lunas (1 NIM = 100,000 Lunas).
    */
-  public async getSupplyAt(
+  public getSupplyAt(
     { genesisSupply, genesisTime, currentTime }: SupplyAtParams,
     options = DEFAULT_OPTIONS,
   ) {

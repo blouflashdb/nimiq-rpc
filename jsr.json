@@ -2,5 +2,5 @@
   "name": "@blouflash/nimiq-rpc",
   "version": "1.0.1",
   "license": "MIT",
-  "exports": "./src/index.ts"
+  "exports": "main.ts"
 }

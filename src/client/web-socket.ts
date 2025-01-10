@@ -1,6 +1,6 @@
 import type { JSONRPCError } from '@open-rpc/client-js'
 import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
-import type { RPCData } from '../types/'
+import type { RPCData } from '../types/index.ts'
 import { Client, RequestManager, WebSocketTransport } from '@open-rpc/client-js'
 
 export interface Subscription<Data, Metadata> {
@@ -108,7 +108,7 @@ export class WebSocketClient {
           callback(error)
         })
 
-        client.onNotification(async (event) => {
+        client.onNotification((event) => {
           const params = event.params as NotificationMessageParams
           const result = params.result as RPCData<Data, Metadata>
 
