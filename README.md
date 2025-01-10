@@ -1,6 +1,6 @@
 # Nimiq RPC Client for TypeScript
 
-A fully typed Nimiq RPC client for Nodejs.
+A fully typed Nimiq RPC client for Nodejs and Deno.
 
 ## How to use
 

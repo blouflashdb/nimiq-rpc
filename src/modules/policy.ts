@@ -3,6 +3,7 @@ import type {
   PolicyConstants,
 } from '../types/index.ts'
 import { DEFAULT_OPTIONS } from '../client/http.ts'
+import type { RPCData } from "../types/logs.ts";
 
 export interface SupplyAtParams {
   genesisSupply: number
@@ -24,7 +25,7 @@ export class PolicyClient {
    *
    * @param options
    */
-  public getPolicyConstants(options = DEFAULT_OPTIONS) {
+  public getPolicyConstants(options = DEFAULT_OPTIONS): Promise<Error | RPCData<PolicyConstants>> {
     return this.client.call<PolicyConstants>(
       { method: 'getPolicyConstants' },
       options,
@@ -39,7 +40,7 @@ export class PolicyClient {
    * @param blockNumber
    * @param options
    */
-  public getEpochAt(blockNumber: number, options = DEFAULT_OPTIONS) {
+  public getEpochAt(blockNumber: number, options = DEFAULT_OPTIONS): Promise<Error | RPCData<number>> {
     return this.client.call<number>({
       method: 'getEpochAt',
       params: [blockNumber],
@@ -59,7 +60,7 @@ export class PolicyClient {
   public getEpochIndexAt(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     return this.client.call<number>({
       method: 'getEpochIndexAt',
       params: [blockNumber],
@@ -75,7 +76,7 @@ export class PolicyClient {
    * @param options
    * @returns The batch number at a given `block_number` (height)
    */
-  public getBatchAt(blockNumber: number, options = DEFAULT_OPTIONS) {
+  public getBatchAt(blockNumber: number, options = DEFAULT_OPTIONS): Promise<Error | RPCData<number>> {
     return this.client.call<number>({
       method: 'getBatchAt',
       params: [blockNumber],
@@ -95,7 +96,7 @@ export class PolicyClient {
   public getBatchIndexAt(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     return this.client.call<number>({
       method: 'getBatchIndexAt',
       params: [blockNumber],
@@ -113,7 +114,7 @@ export class PolicyClient {
   public getElectionBlockAfter(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     return this.client.call<number>({
       method: 'getElectionBlockAfter',
       params: [blockNumber],
@@ -133,7 +134,7 @@ export class PolicyClient {
   public getElectionBlockBefore(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     return this.client.call<number>({
       method: 'getElectionBlockBefore',
       params: [blockNumber],
@@ -153,7 +154,7 @@ export class PolicyClient {
   public getLastElectionBlock(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     return this.client.call<number>({
       method: 'getLastElectionBlock',
       params: [blockNumber],
@@ -172,7 +173,7 @@ export class PolicyClient {
   public isElectionBlockAt(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<boolean>> {
     return this.client.call<boolean>({
       method: 'isElectionBlockAt',
       params: [blockNumber],
@@ -190,7 +191,7 @@ export class PolicyClient {
   public getMacroBlockAfter(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     return this.client.call<number>({
       method: 'getMacroBlockAfter',
       params: [blockNumber],
@@ -208,7 +209,7 @@ export class PolicyClient {
   public getMacroBlockBefore(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     return this.client.call<number>({
       method: 'getMacroBlockBefore',
       params: [blockNumber],
@@ -227,7 +228,7 @@ export class PolicyClient {
   public getLastMacroBlock(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     return this.client.call<number>({
       method: 'getLastMacroBlock',
       params: [blockNumber],
@@ -245,7 +246,7 @@ export class PolicyClient {
   public isMacroBlockAt(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<boolean>> {
     return this.client.call<boolean>({
       method: 'isMacroBlockAt',
       params: [blockNumber],
@@ -264,7 +265,7 @@ export class PolicyClient {
   public isMicroBlockAt(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<boolean>> {
     const req = { method: 'isMicroBlockAt', params: [blockNumber] }
     return this.client.call<boolean>(req, options)
   }
@@ -281,7 +282,7 @@ export class PolicyClient {
   public getFirstBlockOfEpoch(
     epochIndex: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     const req = { method: 'getFirstBlockOf', params: [epochIndex] }
     return this.client.call<number>(req, options)
   }
@@ -297,7 +298,7 @@ export class PolicyClient {
   public getBlockAfterReportingWindow(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     const req = { method: 'getBlockAfterReportingWindow', params: [blockNumber] }
     return this.client.call<number>(req, options)
   }
@@ -313,7 +314,7 @@ export class PolicyClient {
   public getBlockAfterJail(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     const req = { method: 'getBlockAfterJail', params: [blockNumber] }
     return this.client.call<number>(req, options)
   }
@@ -330,7 +331,7 @@ export class PolicyClient {
   public getFirstBlockOfBatch(
     batchIndex: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     const req = { method: 'getFirstBlockOfBatch', params: [batchIndex] }
     return this.client.call<number>(req, options)
   }
@@ -347,7 +348,7 @@ export class PolicyClient {
   public getElectionBlockOfEpoch(
     epochIndex: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     const req = { method: 'getElectionBlockOf', params: [epochIndex] }
     return this.client.call<number>(req, options)
   }
@@ -364,7 +365,7 @@ export class PolicyClient {
   public getMacroBlockOfBatch(
     batchIndex: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     const req = { method: 'getMacroBlockOf', params: [batchIndex] }
     return this.client.call<number>(req, options)
   }
@@ -382,7 +383,7 @@ export class PolicyClient {
   public getFirstBatchOfEpoch(
     blockNumber: number,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     const req = { method: 'getFirstBatchOfEpoch', params: [blockNumber] }
     return this.client.call<number>(req, options)
   }
@@ -405,7 +406,7 @@ export class PolicyClient {
   public getSupplyAt(
     { genesisSupply, genesisTime, currentTime }: SupplyAtParams,
     options = DEFAULT_OPTIONS,
-  ) {
+  ): Promise<Error | RPCData<number>> {
     const req = {
       method: 'getSupplyAt',
       params: [genesisSupply, genesisTime, currentTime],

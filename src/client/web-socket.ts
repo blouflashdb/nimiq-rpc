@@ -25,6 +25,7 @@ export const WS_DEFAULT_OPTIONS: StreamOptions = {
   timeout: 5000, // Default OpenRPC timeout
 } as const
 
+// deno-lint-ignore no-explicit-any
 export type FilterStreamFn = (data: any) => boolean
 
 export interface StreamOptions {

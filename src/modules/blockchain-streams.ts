@@ -8,7 +8,7 @@ export interface BlockParams { retrieve?: RetrieveType.Full | RetrieveType.Parti
 export interface ValidatorElectionParams { address: string }
 export interface LogsParams { addresses?: string[], types?: LogType[] }
 
-function getBlockType(block: any): BlockSubscriptionType {
+function getBlockType(block: Block): BlockSubscriptionType {
   if (!block)
     throw new Error('Block is undefined')
   if (!('isElectionBlock' in block))

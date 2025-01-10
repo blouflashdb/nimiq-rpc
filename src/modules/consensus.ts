@@ -109,7 +109,7 @@ export class ConsensusClient {
   /**
    * Sends a transaction creating a new vesting contract to the network and waits for confirmation
    */
-  public sendSyncNewVestingTransaction(p: VestingTxParams, options: SendTxCallOptions) {
+  public sendSyncNewVestingTransaction(p: VestingTxParams, options: SendTxCallOptions): Promise<RPCData<string> | Error> {
     return this.sendNewVestingTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.wallet] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -117,7 +117,7 @@ export class ConsensusClient {
   /**
    * Returns a serialized transaction redeeming a vesting contract
    */
-  public createRedeemVestingTransaction(p: RedeemVestingTxParams, options = DEFAULT_OPTIONS) {
+  public createRedeemVestingTransaction(p: RedeemVestingTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRedeemVestingTransaction', params: [p.wallet, p.contractAddress, p.recipient, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -125,7 +125,7 @@ export class ConsensusClient {
   /**
    * Sends a transaction redeeming a vesting contract
    */
-  public sendRedeemVestingTransaction(p: RedeemVestingTxParams, options = DEFAULT_OPTIONS) {
+  public sendRedeemVestingTransaction(p: RedeemVestingTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRedeemVestingTransaction', params: [p.wallet, p.contractAddress, p.recipient, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -133,7 +133,7 @@ export class ConsensusClient {
   /**
    * Sends a transaction redeeming a vesting contract and waits for confirmation
    */
-  public sendSyncRedeemVestingTransaction(p: RedeemVestingTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncRedeemVestingTransaction(p: RedeemVestingTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRedeemVestingTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.wallet] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -141,7 +141,7 @@ export class ConsensusClient {
   /**
    * Returns a serialized transaction creating a new HTLC contract
    */
-  public createNewHtlcTransaction(p: HtlcTransactionParams, options = DEFAULT_OPTIONS) {
+  public createNewHtlcTransaction(p: HtlcTransactionParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createNewHtlcTransaction', params: [p.wallet, p.htlcSender, p.htlcRecipient, p.hashRoot, p.hashCount, p.timeout, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -149,7 +149,7 @@ export class ConsensusClient {
   /**
    * Sends a transaction creating a new HTLC contract
    */
-  public sendNewHtlcTransaction(p: HtlcTransactionParams, options = DEFAULT_OPTIONS) {
+  public sendNewHtlcTransaction(p: HtlcTransactionParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendNewHtlcTransaction', params: [p.wallet, p.htlcSender, p.htlcRecipient, p.hashRoot, p.hashCount, p.timeout, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -157,7 +157,7 @@ export class ConsensusClient {
   /**
    * Sends a transaction creating a new HTLC contract and waits for confirmation
    */
-  public sendSyncNewHtlcTransaction(p: HtlcTransactionParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncNewHtlcTransaction(p: HtlcTransactionParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendNewHtlcTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.wallet] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -165,7 +165,7 @@ export class ConsensusClient {
   /**
    * Returns a serialized transaction redeeming an HTLC contract
    */
-  public createRedeemRegularHtlcTransaction(p: RedeemRegularHtlcTxParams, options = DEFAULT_OPTIONS) {
+  public createRedeemRegularHtlcTransaction(p: RedeemRegularHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRedeemRegularHtlcTransaction', params: [p.wallet, p.contractAddress, p.recipient, p.preImage, p.hashRoot, p.hashCount, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -173,7 +173,7 @@ export class ConsensusClient {
   /**
    * Sends a transaction redeeming an HTLC contract
    */
-  public sendRedeemRegularHtlcTransaction(p: RedeemRegularHtlcTxParams, options = DEFAULT_OPTIONS) {
+  public sendRedeemRegularHtlcTransaction(p: RedeemRegularHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRedeemRegularHtlcTransaction', params: [p.wallet, p.contractAddress, p.recipient, p.preImage, p.hashRoot, p.hashCount, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -181,7 +181,7 @@ export class ConsensusClient {
   /**
    * Sends a transaction redeeming a new HTLC contract and waits for confirmation
    */
-  public sendSyncRedeemRegularHtlcTransaction(p: RedeemRegularHtlcTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncRedeemRegularHtlcTransaction(p: RedeemRegularHtlcTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRedeemRegularHtlcTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.wallet] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -190,7 +190,7 @@ export class ConsensusClient {
    * Returns a serialized transaction redeeming a HTLC contract using the `TimeoutResolve`
    * method
    */
-  public createRedeemTimeoutHtlcTransaction(p: RedeemTimeoutHtlcTxParams, options = DEFAULT_OPTIONS) {
+  public createRedeemTimeoutHtlcTransaction(p: RedeemTimeoutHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRedeemRegularHtlcTransaction', params: [p.wallet, p.contractAddress, p.recipient, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -199,7 +199,7 @@ export class ConsensusClient {
    * Sends a transaction redeeming a HTLC contract using the `TimeoutResolve`
    * method to network
    */
-  public sendRedeemTimeoutHtlcTransaction(p: RedeemTimeoutHtlcTxParams, options = DEFAULT_OPTIONS) {
+  public sendRedeemTimeoutHtlcTransaction(p: RedeemTimeoutHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRedeemRegularHtlcTransaction', params: [p.wallet, p.contractAddress, p.recipient, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -208,7 +208,7 @@ export class ConsensusClient {
    * Sends a transaction redeeming a HTLC contract using the `TimeoutResolve`
    * method to network and waits for confirmation
    */
-  public sendSyncRedeemTimeoutHtlcTransaction(p: RedeemTimeoutHtlcTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncRedeemTimeoutHtlcTransaction(p: RedeemTimeoutHtlcTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRedeemTimeoutHtlcTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.wallet] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -217,7 +217,7 @@ export class ConsensusClient {
    * Returns a serialized transaction redeeming a HTLC contract using the `EarlyResolve`
    * method.
    */
-  public createRedeemEarlyHtlcTransaction(p: RedeemEarlyHtlcTxParams, options = DEFAULT_OPTIONS) {
+  public createRedeemEarlyHtlcTransaction(p: RedeemEarlyHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRedeemEarlyHtlcTransaction', params: [p.contractAddress, p.recipient, p.htlcSenderSignature, p.htlcRecipientSignature, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -226,7 +226,7 @@ export class ConsensusClient {
    * Sends a transaction redeeming a HTLC contract using the `EarlyResolve`
    * method.
    */
-  public sendRedeemEarlyHtlcTransaction(p: RedeemEarlyHtlcTxParams, options = DEFAULT_OPTIONS) {
+  public sendRedeemEarlyHtlcTransaction(p: RedeemEarlyHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRedeemEarlyHtlcTransaction', params: [p.contractAddress, p.recipient, p.htlcSenderSignature, p.htlcRecipientSignature, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -235,7 +235,7 @@ export class ConsensusClient {
    * Sends a transaction redeeming a HTLC contract using the `EarlyResolve`
    * method and waits for confirmation
    */
-  public sendSyncRedeemEarlyHtlcTransaction(p: RedeemEarlyHtlcTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncRedeemEarlyHtlcTransaction(p: RedeemEarlyHtlcTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRedeemEarlyHtlcTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.contractAddress] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -244,7 +244,7 @@ export class ConsensusClient {
    * Returns a serialized signature that can be used to redeem funds from a HTLC contract using
    * the `EarlyResolve` method.
    */
-  public signRedeemEarlyHtlcTransaction(p: RedeemEarlyHtlcTxParams, options = DEFAULT_OPTIONS) {
+  public signRedeemEarlyHtlcTransaction(p: RedeemEarlyHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'signRedeemEarlyHtlcTransaction', params: [p.contractAddress, p.recipient, p.htlcSenderSignature, p.htlcRecipientSignature, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -253,7 +253,7 @@ export class ConsensusClient {
    * Returns a serialized `new_staker` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
    */
-  public createNewStakerTransaction(p: CreateStakeTxParams, options = DEFAULT_OPTIONS) {
+  public createNewStakerTransaction(p: CreateStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createNewStakerTransaction', params: [p.senderWallet, p.stakerWallet, p.delegation, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -262,7 +262,7 @@ export class ConsensusClient {
    * Sends a `new_staker` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
    */
-  public sendNewStakerTransaction(p: CreateStakeTxParams, options = DEFAULT_OPTIONS) {
+  public sendNewStakerTransaction(p: CreateStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendNewStakerTransaction', params: [p.senderWallet, p.stakerWallet, p.delegation, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -271,7 +271,7 @@ export class ConsensusClient {
    * Sends a `new_staker` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee and waits for confirmation.
    */
-  public sendSyncNewStakerTransaction(p: CreateStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncNewStakerTransaction(p: CreateStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendNewStakerTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.senderWallet], types: [LogType.CreateStaker] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -280,7 +280,7 @@ export class ConsensusClient {
    * Returns a serialized `stake` transaction. The funds to be staked and the transaction fee will
    * be paid from the `sender_wallet`.
    */
-  public createStakeTransaction(p: StakeTxParams, options = DEFAULT_OPTIONS) {
+  public createStakeTransaction(p: StakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createStakeTransaction', params: [p.senderWallet, p.stakerWallet, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -289,7 +289,7 @@ export class ConsensusClient {
    * Sends a `stake` transaction. The funds to be staked and the transaction fee will
    * be paid from the `sender_wallet`.
    */
-  public sendStakeTransaction(p: StakeTxParams, options = DEFAULT_OPTIONS) {
+  public sendStakeTransaction(p: StakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendStakeTransaction', params: [p.senderWallet, p.stakerWallet, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -298,7 +298,7 @@ export class ConsensusClient {
    * Sends a `stake` transaction. The funds to be staked and the transaction fee will
    * be paid from the `sender_wallet` and waits for confirmation.
    */
-  public sendSyncStakeTransaction(p: StakeTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncStakeTransaction(p: StakeTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendStakeTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.senderWallet], types: [LogType.Stake] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -308,7 +308,7 @@ export class ConsensusClient {
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet).
    */
-  public createUpdateStakerTransaction(p: UpdateStakeTxParams, options = DEFAULT_OPTIONS) {
+  public createUpdateStakerTransaction(p: UpdateStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createUpdateStakerTransaction', params: [p.senderWallet, p.stakerWallet, p.newDelegation, p.newInactiveBalance, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -318,7 +318,7 @@ export class ConsensusClient {
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet).
    */
-  public sendUpdateStakerTransaction(p: UpdateStakeTxParams, options = DEFAULT_OPTIONS) {
+  public sendUpdateStakerTransaction(p: UpdateStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendUpdateStakerTransaction', params: [p.senderWallet, p.stakerWallet, p.newDelegation, p.newInactiveBalance, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -328,7 +328,7 @@ export class ConsensusClient {
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet) and waits for confirmation.
    */
-  public sendSyncUpdateStakerTransaction(p: UpdateStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncUpdateStakerTransaction(p: UpdateStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendUpdateStakerTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.senderWallet], types: [LogType.UpdateStaker] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -338,7 +338,7 @@ export class ConsensusClient {
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet).
    */
-  public createSetActiveStakeTransaction(p: SetActiveStakeTxParams, options = DEFAULT_OPTIONS) {
+  public createSetActiveStakeTransaction(p: SetActiveStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createSetActiveStakeTransaction', params: [p.senderWallet, p.stakerWallet, p.newActiveBalance, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -348,7 +348,7 @@ export class ConsensusClient {
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet).
    */
-  public sendSetActiveStakeTransaction(p: SetActiveStakeTxParams, options = DEFAULT_OPTIONS) {
+  public sendSetActiveStakeTransaction(p: SetActiveStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendSetActiveStakeTransaction', params: [p.senderWallet, p.stakerWallet, p.newActiveBalance, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -358,7 +358,7 @@ export class ConsensusClient {
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet) and waits for confirmation.
    */
-  public sendSyncSetActiveStakeTransaction(p: SetActiveStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncSetActiveStakeTransaction(p: SetActiveStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendSetActiveStakeTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.senderWallet], types: [LogType.SetActiveStake] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -368,7 +368,7 @@ export class ConsensusClient {
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet).
    */
-  public createRetireStakeTransaction(p: CreateRetireStakeTxParams, options = DEFAULT_OPTIONS) {
+  public createRetireStakeTransaction(p: CreateRetireStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRetireStakeTransaction', params: [p.senderWallet, p.stakerWallet, p.retireStake, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -378,7 +378,7 @@ export class ConsensusClient {
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet).
    */
-  public sendRetireStakeTransaction(p: CreateRetireStakeTxParams, options = DEFAULT_OPTIONS) {
+  public sendRetireStakeTransaction(p: CreateRetireStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRetireStakeTransaction', params: [p.senderWallet, p.stakerWallet, p.retireStake, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -388,7 +388,7 @@ export class ConsensusClient {
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet) and waits for confirmation.
    */
-  public sendSyncRetireStakeTransaction(p: CreateRetireStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncRetireStakeTransaction(p: CreateRetireStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRetireStakeTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.senderWallet], types: [LogType.RetireStake] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -396,7 +396,7 @@ export class ConsensusClient {
   /**
    * Returns a serialized `remove_stake` transaction.
    */
-  public createRemoveStakeTransaction(p: RemoveStakeTxParams, options = DEFAULT_OPTIONS) {
+  public createRemoveStakeTransaction(p: RemoveStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRemoveStakeTransaction', params: [p.stakerWallet, p.recipient, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -404,7 +404,7 @@ export class ConsensusClient {
   /**
    * Sends a `remove_stake` transaction.
    */
-  public sendRemoveStakeTransaction(p: RemoveStakeTxParams, options = DEFAULT_OPTIONS) {
+  public sendRemoveStakeTransaction(p: RemoveStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRemoveStakeTransaction', params: [p.stakerWallet, p.recipient, p.value, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -412,7 +412,7 @@ export class ConsensusClient {
   /**
    * Sends a `remove_stake` transaction and waits for confirmation.
    */
-  public sendSyncRemoveStakeTransaction(p: RemoveStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncRemoveStakeTransaction(p: RemoveStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRemoveStakeTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.stakerWallet], types: [LogType.RemoveStake] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -425,7 +425,7 @@ export class ConsensusClient {
    * "" = Set the signal data field to None.
    * "0x29a4b..." = Set the signal data field to Some(0x29a4b...).
    */
-  public createNewValidatorTransaction(p: NewValidatorTxParams, options = DEFAULT_OPTIONS) {
+  public createNewValidatorTransaction(p: NewValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createNewValidatorTransaction', params: [p.senderWallet, p.validator, p.signingSecretKey, p.votingSecretKey, p.rewardAddress, p.signalData, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -438,7 +438,7 @@ export class ConsensusClient {
    * "" = Set the signal data field to None.
    * "0x29a4b..." = Set the signal data field to Some(0x29a4b...).
    */
-  public sendNewValidatorTransaction(p: NewValidatorTxParams, options = DEFAULT_OPTIONS) {
+  public sendNewValidatorTransaction(p: NewValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendNewValidatorTransaction', params: [p.senderWallet, p.validator, p.signingSecretKey, p.votingSecretKey, p.rewardAddress, p.signalData, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -452,7 +452,7 @@ export class ConsensusClient {
    * "" = Set the signal data field to None.
    * "0x29a4b..." = Set the signal data field to Some(0x29a4b...).
    */
-  public sendSyncNewValidatorTransaction(p: NewValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncNewValidatorTransaction(p: NewValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendNewValidatorTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.senderWallet], types: [LogType.CreateValidator] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -466,7 +466,7 @@ export class ConsensusClient {
    * "" = Change the signal data field to None.
    * "0x29a4b..." = Change the signal data field to Some(0x29a4b...).
    */
-  public createUpdateValidatorTransaction(p: UpdateValidatorTxParams, options = DEFAULT_OPTIONS) {
+  public createUpdateValidatorTransaction(p: UpdateValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createUpdateValidatorTransaction', params: [p.senderWallet, p.validator, p.newSigningSecretKey, p.newVotingSecretKey, p.newRewardAddress, p.newSignalData, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -480,7 +480,7 @@ export class ConsensusClient {
    * "" = Change the signal data field to None.
    * "0x29a4b..." = Change the signal data field to Some(0x29a4b...).
    */
-  public sendUpdateValidatorTransaction(p: UpdateValidatorTxParams, options = DEFAULT_OPTIONS) {
+  public sendUpdateValidatorTransaction(p: UpdateValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendUpdateValidatorTransaction', params: [p.senderWallet, p.validator, p.newSigningSecretKey, p.newVotingSecretKey, p.newRewardAddress, p.newSignalData, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -494,7 +494,7 @@ export class ConsensusClient {
    * "" = Change the signal data field to None.
    * "0x29a4b..." = Change the signal data field to Some(0x29a4b...).
    */
-  public sendSyncUpdateValidatorTransaction(p: UpdateValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncUpdateValidatorTransaction(p: UpdateValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendUpdateValidatorTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.validator], types: [LogType.UpdateValidator] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -503,7 +503,7 @@ export class ConsensusClient {
    * Returns a serialized `inactivate_validator` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
    */
-  public createDeactivateValidatorTransaction(p: DeactiveValidatorTxParams, options = DEFAULT_OPTIONS) {
+  public createDeactivateValidatorTransaction(p: DeactiveValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createDeactivateValidatorTransaction', params: [p.senderWallet, p.validator, p.signingSecretKey, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -512,7 +512,7 @@ export class ConsensusClient {
    * Sends a `inactivate_validator` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
    */
-  public sendDeactivateValidatorTransaction(p: DeactiveValidatorTxParams, options = DEFAULT_OPTIONS) {
+  public sendDeactivateValidatorTransaction(p: DeactiveValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendDeactivateValidatorTransaction', params: [p.senderWallet, p.validator, p.signingSecretKey, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -522,7 +522,7 @@ export class ConsensusClient {
    * You need to provide the address of a basic account (the sender wallet)
    * to pay the transaction fee.
    */
-  public sendSyncDeactivateValidatorTransaction(p: DeactiveValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncDeactivateValidatorTransaction(p: DeactiveValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendDeactivateValidatorTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.validator], types: [LogType.DeactivateValidator] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -531,7 +531,7 @@ export class ConsensusClient {
    * Returns a serialized `reactivate_validator` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
    */
-  public createReactivateValidatorTransaction(p: ReactivateValidatorTxParams, options = DEFAULT_OPTIONS) {
+  public createReactivateValidatorTransaction(p: ReactivateValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createReactivateValidatorTransaction', params: [p.senderWallet, p.validator, p.signingSecretKey, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -540,7 +540,7 @@ export class ConsensusClient {
    * Sends a `reactivate_validator` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
    */
-  public sendReactivateValidatorTransaction(p: ReactivateValidatorTxParams, options = DEFAULT_OPTIONS) {
+  public sendReactivateValidatorTransaction(p: ReactivateValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendReactivateValidatorTransaction', params: [p.senderWallet, p.validator, p.signingSecretKey, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -550,7 +550,7 @@ export class ConsensusClient {
    * You need to provide the address of a basic account (the sender wallet)
    * to pay the transaction fee.
    */
-  public sendSyncReactivateValidatorTransaction(p: ReactivateValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncReactivateValidatorTransaction(p: ReactivateValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendReactivateValidatorTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.validator], types: [LogType.ReactivateValidator] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -559,7 +559,7 @@ export class ConsensusClient {
    * Returns a serialized `retire_validator` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
    */
-  public createRetireValidatorTransaction(p: RetireValidatorTxParams, options = DEFAULT_OPTIONS) {
+  public createRetireValidatorTransaction(p: RetireValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRetireValidatorTransaction', params: [p.senderWallet, p.validator, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -568,7 +568,7 @@ export class ConsensusClient {
    * Sends a `retire_validator` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
    */
-  public sendRetireValidatorTransaction(p: RetireValidatorTxParams, options = DEFAULT_OPTIONS) {
+  public sendRetireValidatorTransaction(p: RetireValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRetireValidatorTransaction', params: [p.senderWallet, p.validator, p.fee, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -578,7 +578,7 @@ export class ConsensusClient {
    * You need to provide the address of a basic account (the sender wallet)
    * to pay the transaction fee.
    */
-  public sendSyncRetireValidatorTransaction(p: RetireValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncRetireValidatorTransaction(p: RetireValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRetireValidatorTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.validator], types: [LogType.RetireValidator] }, options.waitForConfirmationTimeout, hash.context)
   }
@@ -589,7 +589,7 @@ export class ConsensusClient {
    * Note in order for this transaction to be accepted fee + value should be equal to the validator deposit, which is not a fixed value:
    * Failed delete validator transactions can diminish the validator deposit
    */
-  public createDeleteValidatorTransaction(p: DeleteValidatorTxParams, options = DEFAULT_OPTIONS) {
+  public createDeleteValidatorTransaction(p: DeleteValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createDeleteValidatorTransaction', params: [p.validator, p.recipient, p.fee, p.value, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -600,7 +600,7 @@ export class ConsensusClient {
    * Note in order for this transaction to be accepted fee + value should be equal to the validator deposit, which is not a fixed value:
    * Failed delete validator transactions can diminish the validator deposit
    */
-  public sendDeleteValidatorTransaction(p: DeleteValidatorTxParams, options = DEFAULT_OPTIONS) {
+  public sendDeleteValidatorTransaction(p: DeleteValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendDeleteValidatorTransaction', params: [p.validator, p.recipient, p.fee, p.value, this.getValidityStartHeight(p)] }
     return this.client.call<string>(req, options)
   }
@@ -611,7 +611,7 @@ export class ConsensusClient {
    * Note in order for this transaction to be accepted fee + value should be equal to the validator deposit, which is not a fixed value:
    * Failed delete validator transactions can diminish the validator deposit
    */
-  public sendSyncDeleteValidatorTransaction(p: DeleteValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX) {
+  public sendSyncDeleteValidatorTransaction(p: DeleteValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendDeleteValidatorTransaction(p, options)
     // return await this.waitForConfirmation(hash.data!, { addresses: [p.validator], types: [LogType.DeleteValidator] }, options.waitForConfirmationTimeout, hash.context)
   }
