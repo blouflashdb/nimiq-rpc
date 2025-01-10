@@ -77,6 +77,13 @@ export class NimiqRPCClient {
 }
 
 let client: NimiqRPCClient
+
+/**
+ * Create a Nimiq RPC client.
+ *
+ * @param url Node URL
+ * @returns A Nimiq RPC client.
+ */
 export function createClient(url: string): NimiqRPCClient {
   if (client)
     return client
