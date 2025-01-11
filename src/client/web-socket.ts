@@ -1,211 +1,214 @@
-import type { JSONRPCError } from '@open-rpc/client-js'
-import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
-import type { RPCData } from '../types/index.ts'
-import { Client, RequestManager, WebSocketTransport } from '@open-rpc/client-js'
+import type { JSONRPCError } from "@open-rpc/client-js";
+import type { RequestArguments } from "@open-rpc/client-js/build/ClientInterface";
+import type { RPCData } from "../types/index.ts";
+import {
+  Client,
+  RequestManager,
+  WebSocketTransport,
+} from "@open-rpc/client-js";
 
-export interface Subscription<Data, Metadata> {
-  next: (callback: (data: RPCData<Data, Metadata> | JSONRPCError) => void) => void
-  close: () => void
-  ws: Client
+/**
+ * Interface representing a subscription.
+ */
+export interface Subscription {
+  /**
+   * Closes the subscription.
+   */
+  close: () => void;
 
-  context: {
-    body: RequestArguments
-    timestamp: number
-    url: string
-  }
+  /**
+   * The WebSocket client instance.
+   */
+  ws: Client;
 
-  getSubscriptionId: () => number
-  isConnectionPaused: () => boolean
-  isConnectionOpen: () => boolean
+  /**
+   * Gets the subscription ID.
+   *
+   * @returns {number} - The subscription ID.
+   */
+  getSubscriptionId: () => number;
 }
 
-export const WS_DEFAULT_OPTIONS: StreamOptions = {
-  once: false,
-  filter: () => true,
-  timeout: 5000, // Default OpenRPC timeout
-} as const
-
-// deno-lint-ignore no-explicit-any
-export type FilterStreamFn = (data: any) => boolean
-
-export interface StreamOptions {
-  once: boolean
-  filter?: FilterStreamFn
-  timeout: number
-  onError?: (error?: Error) => void
+/**
+ * Options for configuring the WebSocket client.
+ */
+export interface WebsocketClientOptions {
   /**
-   * If true or an object, we attempt reconnects when the socket closes.
-   * - `retries` can be a number or a function. If it's a function, it should return true to keep retrying.
-   * - `delay` is the time before trying again.
-   * - `onFailed` is called when we stop retrying.
+   * Milliseconds before timing out while calling an RPC method.
    */
-  autoReconnect?: boolean | {
-    retries?: number | (() => boolean)
-    delay?: number
-    onFailed?: () => void
-  }
+  callTimeout: number;
+
+  /**
+   * Milliseconds between attempts to connect.
+   */
+  reconnectTimeout: number;
+
+  /**
+   * Maximum number of times to try connecting before giving up.
+   */
+  maxReconnects: number;
+}
+
+/**
+ * Default options for the WebSocket client.
+ */
+export const DEFAULT_CLIENT_OPTIONS: WebsocketClientOptions = {
+  callTimeout: 30000,
+  reconnectTimeout: 3000,
+  maxReconnects: 5,
+} as const;
+
+/**
+ * Options for configuring the WebSocket stream.
+ */
+export interface WebsocketStreamOptions {
+  /**
+   * Optional filter function for stream data.
+   */
+  filter?: FilterStreamFn;
+}
+
+/**
+ * Default options for the WebSocket stream.
+ */
+export const DEFAULT_STREAM_OPTIONS: WebsocketStreamOptions = {
+  filter: () => true,
+} as const;
+
+/**
+ * Type definition for a function that filters stream data.
+ *
+ * @param {any} data - The data to be filtered.
+ * @returns {boolean} - Returns true if the data passes the filter, otherwise false.
+ */
+// deno-lint-ignore no-explicit-any
+export type FilterStreamFn = (data: any) => boolean;
+
+/**
+ * Interface representing WebSocket callbacks.
+ *
+ * @template Data - The type of the data.
+ * @template Metadata - The type of the metadata.
+ */
+export interface WebSocketCallbacks<Data, Metadata> {
+  /**
+   * Callback function to handle errors.
+   *
+   * @param {JSONRPCError} data - The error data.
+   */
+  onError?: (data: JSONRPCError) => void;
+
+  /**
+   * Callback function to handle messages.
+   *
+   * @param {RPCData<Data, Metadata>} data - The message data.
+   */
+  onMessage?: (data: RPCData<Data, Metadata>) => void;
+
+  /**
+   * Callback function to handle connection errors.
+   *
+   * @param {ErrorEvent} error - The connection error.
+   */
+  onConnectionError?: (error: Error) => void;
 }
 
 interface NotificationMessageParams {
-  subscription: number
-  result: object
-};
+  subscription: number;
+  result: object;
+}
 
 /**
  * WebSocketClient class provides methods to interact with the Nimiq Albatross Node over WebSocket.
  */
 export class WebSocketClient {
-  private url: URL
-  private isOpen = false
-  private explicitlyClosed = false
-
-  // For reconnect logic
-  private retriesCount = 0
-  private reconnectTimer?: ReturnType<typeof setTimeout>
+  private url: URL;
 
   constructor(url: string) {
-    const wsUrl = new URL(url.replace(/^http/, 'ws'))
-    wsUrl.pathname = '/ws'
-    this.url = wsUrl
-  }
-
-  private clearReconnectTimer(): void {
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer)
-      this.reconnectTimer = undefined
-    }
+    const wsUrl = new URL(url.replace(/^http/, "ws"));
+    wsUrl.pathname = "/ws";
+    this.url = wsUrl;
   }
 
   /**
    * Make a raw streaming call to the Albatross Node.
    *
-   * @param request - The request object containing the following properties:
-   * @param request.method - The name of the method to call.
-   * @param request.params - The parameters to pass with the call, if any.
-   * @param userOptions - The streaming options for the call. Defaults to WS_DEFAULT_OPTIONS if not provided.
-   * @returns A promise that resolves with a Subscription object.
+   * @param {Object} request - The request object containing the following properties:
+   * @param {string} request.method - The name of the method to call.
+   * @param {any[]} request.params - The parameters to pass with the call, if any.
+   * @param {WebSocketCallbacks<Data, Metadata>} wsCallbacks - The WebSocket callbacks.
+   * @param {WebsocketClientOptions} [options=DEFAULT_CLIENT_OPTIONS] - The streaming options for the call. Defaults to DEFAULT_CLIENT_OPTIONS if not provided.
+   * @returns {Promise<Subscription>} - A promise that resolves with a Subscription object.
+   *
+   * @template Data - The type of the data.
+   * @template Metadata - The type of the metadata.
    */
   async subscribe<
     Data,
     Metadata,
   >(
     request: RequestArguments,
-    userOptions: StreamOptions,
-  ): Promise<Subscription<Data, Metadata>> {
-    const transport = new WebSocketTransport(this.url.toString())
-    const client = new Client(new RequestManager([transport]))
+    wsCallbacks: WebSocketCallbacks<Data, Metadata>,
+    options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
+    streamOptions: WebsocketStreamOptions = DEFAULT_STREAM_OPTIONS,
+  ): Promise<Subscription> {
+    const transport = new WebSocketTransport(this.url.toString());
+    const client = new Client(new RequestManager([transport]));
+    let disconnects = 0;
 
-    const options = {
-      ...WS_DEFAULT_OPTIONS,
-      ...userOptions,
-    }
+    client.onNotification((event) => {
+      const params = event.params as NotificationMessageParams;
+      const result = params.result as RPCData<Data, Metadata>;
 
-    // "autoReconnect" can be a boolean or an object
-    const reconnectSettings
-      = typeof options.autoReconnect === 'object'
-        ? options.autoReconnect
-        : options.autoReconnect === true
-          ? {}
-          : undefined
-
-    const { once, filter, timeout } = options
-
-    // Request subscription ID
-    const subscriptionId: number = await client.request(request, timeout)
-    this.explicitlyClosed = false
-    this.retriesCount = 0 // reset retries on successful open
-
-    const args: Subscription<Data, Metadata> = {
-      next: (callback: (data: RPCData<Data, Metadata> | JSONRPCError) => void) => {
-        client.onError((error) => {
-          callback(error)
-        })
-
-        client.onNotification((event) => {
-          const params = event.params as NotificationMessageParams
-          const result = params.result as RPCData<Data, Metadata>
-
-          if (filter && !filter(result.data)) {
-            return
-          }
-
-          callback(result)
-
-          if (once) {
-            client.close()
-          }
-        })
-      },
-      close: () => {
-        this.explicitlyClosed = true
-        client.close()
-      },
-      getSubscriptionId: () => subscriptionId,
-      isConnectionPaused: () => transport.connection.isPaused,
-      isConnectionOpen: () => this.isOpen,
-      context: {
-        body: request,
-        url: this.url.toString(),
-        timestamp: Date.now(),
-      },
-      ws: client,
-    }
-
-    transport.connection.onopen = () => {
-      this.isOpen = true
-      this.retriesCount = 0
-    }
-
-    transport.connection.onclose = () => {
-      this.isOpen = false
-      if (!this.explicitlyClosed) {
-        // Check if autoReconnect is enabled
-        if (reconnectSettings) {
-          const maxRetries = reconnectSettings.retries ?? -1
-          const delay = reconnectSettings.delay ?? 1000
-          const canKeepRetrying = (): boolean => {
-            if (typeof maxRetries === 'number') {
-              return maxRetries < 0 || this.retriesCount < maxRetries
-            }
-            else if (typeof maxRetries === 'function') {
-              return maxRetries()
-            }
-            return false
-          }
-
-          if (canKeepRetrying()) {
-            this.retriesCount++
-            // clear any existing timer before setting a new one
-            this.clearReconnectTimer()
-            this.reconnectTimer = setTimeout(() => {
-              // Try again by calling subscribe with the same args
-              this.subscribe(request, userOptions).catch(() => {
-                // If it still fails, we might try again
-                // or pass the error to the onError callback
-                const { onError } = options
-                onError?.(new Error('Failed to reconnect'))
-              })
-            }, delay)
-          }
-          else {
-            reconnectSettings.onFailed?.()
-          }
-        }
-        else {
-          // if autoReconnect is not enabled, call user-provided onError
-          const { onError } = options
-          onError?.(new Error('WebSocket connection closed unexpectedly'))
-        }
+      if (streamOptions.filter && !streamOptions.filter(result.data)) {
+        return;
       }
-    }
+
+      wsCallbacks.onMessage?.(result);
+    });
+
+    client.onError((error) => {
+      wsCallbacks.onError?.(error);
+    });
+
+    transport.connection.addEventListener("open", () => {
+      disconnects = 0;
+    });
+
+    transport.connection.addEventListener("close", () => {
+      disconnects++;
+      if (disconnects <= options.maxReconnects) {
+        setTimeout(() => {
+          reconnect();
+        }, options.reconnectTimeout);
+      }
+    });
 
     transport.connection.onerror = (event) => {
-      console.error('WebSocket error', event)
-      this.isOpen = false
-      const { onError } = options
-      onError?.(new Error(event.message))
-    }
+      wsCallbacks.onConnectionError?.(new Error(event.message));
+    };
 
-    return args
+    const close = () => client.close();
+
+    let subscriptionId: number = await client.request(
+      request,
+      options.callTimeout,
+    );
+
+    const reconnect = async () => {
+      close();
+
+      subscriptionId = await client.request(request, options.callTimeout);
+    };
+
+    const args: Subscription = {
+      close: () => {
+        client.close();
+      },
+      getSubscriptionId: () => subscriptionId,
+      ws: client,
+    };
+
+    return args;
   }
 }

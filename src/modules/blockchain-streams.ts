@@ -1,7 +1,6 @@
-import type { FilterStreamFn, StreamOptions, Subscription, WebSocketClient } from '../client/web-socket.ts'
+import { DEFAULT_CLIENT_OPTIONS, DEFAULT_STREAM_OPTIONS, type WebsocketClientOptions, type WebsocketStreamOptions, type FilterStreamFn, type Subscription, type WebSocketCallbacks, type WebSocketClient } from '../client/web-socket.ts'
 import type { Block, BlockchainState, LogType, MacroBlock, MicroBlock, Validator } from '../types/index.ts'
 import type { BlockLog } from '../types/logs.ts'
-import { WS_DEFAULT_OPTIONS } from '../client/web-socket.ts'
 import { BlockSubscriptionType, RetrieveType } from '../types/index.ts'
 
 export interface BlockParams { retrieve?: RetrieveType.Full | RetrieveType.Partial }
@@ -34,105 +33,123 @@ export class BlockchainStream {
   /**
    * Subscribes to block hash events.
    *
-   * @param userOptions - Optional streaming options.
+   * @param wsCallbacks - The WebSocket callbacks.
+   * @param options - Optional WebSocket client options.
+   * @param streamOptions - Optional WebSocket stream options.
    * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForBlockHashes<T = string, M = undefined>(
-    userOptions?: Partial<StreamOptions>,
-  ): Promise<Subscription<T, M>> {
-    const options: StreamOptions = { ...WS_DEFAULT_OPTIONS, ...userOptions as StreamOptions }
-    return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlockHash' }, options)
+    wsCallbacks: WebSocketCallbacks<T, M>,
+    options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
+    streamOptions: WebsocketStreamOptions = DEFAULT_STREAM_OPTIONS,
+  ): Promise<Subscription> {
+    return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlockHash' }, wsCallbacks, options, streamOptions)
   }
 
   /**
    * Subscribes to election blocks.
    *
    * @param params - The block parameters.
-   * @param userOptions - Optional streaming options.
+   * @param wsCallbacks - The WebSocket callbacks.
+   * @param options - Optional WebSocket client options.
    * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForElectionBlocks<T = Block, M = undefined>(
     params: BlockParams = {},
-    userOptions?: Partial<StreamOptions>,
-  ): Promise<Subscription<T, M>> {
+    wsCallbacks: WebSocketCallbacks<T, M>,
+    options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS
+  ): Promise<Subscription> {
     const { retrieve = RetrieveType.Full } = params
-    const options = { ...WS_DEFAULT_OPTIONS, ...userOptions, filter: isElection }
-    return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, options)
+    return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, wsCallbacks, options, { filter: isElection })
   }
 
   /**
    * Subscribes to micro blocks.
    *
    * @param params - The block parameters.
-   * @param userOptions - Optional streaming options.
+   * @param wsCallbacks - The WebSocket callbacks.
+   * @param options - Optional WebSocket client options.
    * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForMicroBlocks<T = MicroBlock, M = undefined>(
     params: BlockParams = {},
-    userOptions?: Partial<StreamOptions>,
-  ): Promise<Subscription<T, M>> {
+    wsCallbacks: WebSocketCallbacks<T, M>,
+    options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS
+  ): Promise<Subscription> {
     const { retrieve = RetrieveType.Full } = params
-    const options = { ...WS_DEFAULT_OPTIONS, ...userOptions, filter: isMicro }
-    return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, options)
+    return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, wsCallbacks, options, { filter: isMicro })
   }
 
   /**
    * Subscribes to macro blocks.
    *
    * @param params - The block parameters.
-   * @param userOptions - Optional streaming options.
+   * @param wsCallbacks - The WebSocket callbacks.
+   * @param options - Optional WebSocket client options.
    * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForMacroBlocks<T = MacroBlock, M = undefined>(
     params: BlockParams = {},
-    userOptions?: Partial<StreamOptions>,
-  ): Promise<Subscription<T, M>> {
+    wsCallbacks: WebSocketCallbacks<T, M>,
+    options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS
+  ): Promise<Subscription> {
     const { retrieve = RetrieveType.Full } = params || {}
-    const options = { ...WS_DEFAULT_OPTIONS, ...userOptions, filter: isMacro }
-    return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, options)
+    return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, wsCallbacks, options, { filter: isMacro })
   }
 
   /**
    * Subscribes to all blocks.
    *
    * @param params - The block parameters.
-   * @param userOptions - Optional streaming options.
+   * @param wsCallbacks - The WebSocket callbacks.
+   * @param options - Optional WebSocket client options.
+   * @param streamOptions - Optional WebSocket stream options.
    * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForBlocks<T = Block, M = undefined>(
     params: BlockParams = {},
-    userOptions?: Partial<StreamOptions>,
-  ): Promise<Subscription<T, M>> {
+    wsCallbacks: WebSocketCallbacks<T, M>,
+    options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
+    streamOptions: WebsocketStreamOptions = DEFAULT_STREAM_OPTIONS,
+  ): Promise<Subscription> {
     const { retrieve = RetrieveType.Full } = params
-    return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, { ...WS_DEFAULT_OPTIONS, ...userOptions })
+    return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, wsCallbacks, options, streamOptions)
   }
 
   /**
    * Subscribes to pre epoch validators events.
    *
    * @param params - The validator election parameters.
-   * @param userOptions - Optional streaming options.
+   * @param wsCallbacks - The WebSocket callbacks.
+   * @param options - Optional WebSocket client options.
+   * @param streamOptions - Optional WebSocket stream options.
    * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForValidatorElectionByAddress<T = Validator, M = BlockchainState>(
     params: ValidatorElectionParams,
-    userOptions?: Partial<StreamOptions>,
-  ): Promise<Subscription<T, M>> {
-    return this.ws.subscribe<T, M>({ method: 'subscribeForValidatorElectionByAddress', params: [params.address] }, { ...WS_DEFAULT_OPTIONS, ...userOptions })
+    wsCallbacks: WebSocketCallbacks<T, M>,
+    options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
+    streamOptions: WebsocketStreamOptions = DEFAULT_STREAM_OPTIONS,
+  ): Promise<Subscription> {
+    return this.ws.subscribe<T, M>({ method: 'subscribeForValidatorElectionByAddress', params: [params.address] }, wsCallbacks, options, streamOptions)
   }
 
   /**
    * Subscribes to log events related to a given list of addresses and log types.
    *
    * @param params - The log parameters.
-   * @param userOptions - Optional streaming options.
+   * @param wsCallbacks - The WebSocket callbacks.
+   * @param options - Optional WebSocket client options.
+   * @param streamOptions - Optional WebSocket stream options.
    * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForLogsByAddressesAndTypes<T = BlockLog, M = BlockchainState>(
     params: LogsParams = {},
-    userOptions?: Partial<StreamOptions>,
-  ): Promise<Subscription<T, M>> {
+    wsCallbacks: WebSocketCallbacks<T, M>,
+    options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
+    streamOptions: WebsocketStreamOptions = DEFAULT_STREAM_OPTIONS,
+  ): Promise<Subscription> {
     const { addresses = [], types = [] } = params
-    return this.ws.subscribe<T, M>({ method: 'subscribeForLogsByAddressesAndTypes', params: [addresses, types] }, { ...WS_DEFAULT_OPTIONS, ...userOptions })
+    return this.ws.subscribe<T, M>({ method: 'subscribeForLogsByAddressesAndTypes', params: [addresses, types] }, wsCallbacks, options, streamOptions)
   }
 }
