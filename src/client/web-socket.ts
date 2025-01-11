@@ -56,17 +56,18 @@ export const DEFAULT_CLIENT_OPTIONS: WebsocketClientOptions = {
 /**
  * Options for configuring the WebSocket stream.
  */
-export interface WebsocketStreamOptions {
+export interface WebsocketStreamOptions<T> {
   /**
    * Optional filter function for stream data.
    */
-  filter?: FilterStreamFn;
+  filter?: FilterStreamFn<T>;
 }
 
 /**
  * Default options for the WebSocket stream.
  */
-export const DEFAULT_STREAM_OPTIONS: WebsocketStreamOptions = {
+// deno-lint-ignore no-explicit-any
+export const DEFAULT_STREAM_OPTIONS: WebsocketStreamOptions<any> = {
   filter: () => true,
 } as const;
 
@@ -76,8 +77,7 @@ export const DEFAULT_STREAM_OPTIONS: WebsocketStreamOptions = {
  * @param {any} data - The data to be filtered.
  * @returns {boolean} - Returns true if the data passes the filter, otherwise false.
  */
-// deno-lint-ignore no-explicit-any
-export type FilterStreamFn = (data: any) => boolean;
+export type FilterStreamFn<T> = (data: T) => boolean;
 
 /**
  * Interface representing WebSocket callbacks.
@@ -145,15 +145,17 @@ export class WebSocketClient {
     request: RequestArguments,
     wsCallbacks: WebSocketCallbacks<Data, Metadata>,
     options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
-    streamOptions: WebsocketStreamOptions = DEFAULT_STREAM_OPTIONS,
+    streamOptions: WebsocketStreamOptions<Data> = DEFAULT_STREAM_OPTIONS,
   ): Promise<Subscription> {
+    const clientUrl = this.url;
+
     let client: Client | null = null;
     let disconnects = 0;
     let subscriptionId = 0;
     let forceClose = false;
 
-    function createClient(url: URL): Client {
-      const transport = new WebSocketTransport(url.toString());
+    function createClient(): Client {
+      const transport = new WebSocketTransport(clientUrl.toString());
       const client = new Client(new RequestManager([transport]));
 
       client.onNotification((event) => {
@@ -182,7 +184,7 @@ export class WebSocketClient {
         disconnects++;
         if (disconnects <= options.maxReconnects) {
           setTimeout(() => {
-            reconnect(url);
+            reconnect();
           }, options.reconnectTimeout);
         }
       });
@@ -194,22 +196,22 @@ export class WebSocketClient {
       return client;
     }
 
-    async function reconnect(url: URL): Promise<void> {
+    async function reconnect(): Promise<void> {
       client?.close();
       client = null;
 
-      subscriptionId = await requestSubscription(url);
+      subscriptionId = await requestSubscription();
     }
 
-    async function requestSubscription(url: URL): Promise<number> {
+    function requestSubscription(): Promise<number> {
       if(!client) {
-        client = createClient(url);
+        client = createClient();
       }
 
-      return await client.request(request, options.callTimeout);
+      return client.request(request, options.callTimeout);
     }
 
-    subscriptionId = await requestSubscription(this.url);
+    subscriptionId = await requestSubscription();
 
     const args: Subscription = {
       close: () => {

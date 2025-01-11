@@ -2,6 +2,7 @@ import { DEFAULT_CLIENT_OPTIONS, DEFAULT_STREAM_OPTIONS, type WebsocketClientOpt
 import type { Block, BlockchainState, LogType, MacroBlock, MicroBlock, Validator } from '../types/index.ts'
 import type { BlockLog } from '../types/logs.ts'
 import { BlockSubscriptionType, RetrieveType } from '../types/index.ts'
+import type { ElectionMacroBlock } from "../types/common.ts";
 
 export interface BlockParams { retrieve?: RetrieveType.Full | RetrieveType.Partial }
 export interface ValidatorElectionParams { address: string }
@@ -17,9 +18,9 @@ function getBlockType(block: Block): BlockSubscriptionType {
   return BlockSubscriptionType.Macro
 }
 
-const isMicro: FilterStreamFn = b => getBlockType(b) === BlockSubscriptionType.Micro
-const isMacro: FilterStreamFn = b => getBlockType(b) === BlockSubscriptionType.Macro
-const isElection: FilterStreamFn = b => getBlockType(b) === BlockSubscriptionType.Election
+const isMicro: FilterStreamFn<Block> = b => getBlockType(b) === BlockSubscriptionType.Micro
+const isMacro: FilterStreamFn<Block> = b => getBlockType(b) === BlockSubscriptionType.Macro
+const isElection: FilterStreamFn<Block> = b => getBlockType(b) === BlockSubscriptionType.Election
 
 /**
  * BlockchainStream class provides methods to interact with the Nimiq Albatross Node's blockchain streams.
@@ -41,7 +42,7 @@ export class BlockchainStream {
   public subscribeForBlockHashes<T = string, M = undefined>(
     wsCallbacks: WebSocketCallbacks<T, M>,
     options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
-    streamOptions: WebsocketStreamOptions = DEFAULT_STREAM_OPTIONS,
+    streamOptions: WebsocketStreamOptions<T> = DEFAULT_STREAM_OPTIONS,
   ): Promise<Subscription> {
     return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlockHash' }, wsCallbacks, options, streamOptions)
   }
@@ -54,13 +55,13 @@ export class BlockchainStream {
    * @param options - Optional WebSocket client options.
    * @returns A promise that resolves with a Subscription object.
    */
-  public subscribeForElectionBlocks<T = Block, M = undefined>(
+  public subscribeForElectionBlocks(
     params: BlockParams = {},
-    wsCallbacks: WebSocketCallbacks<T, M>,
+    wsCallbacks: WebSocketCallbacks<ElectionMacroBlock, undefined>,
     options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS
   ): Promise<Subscription> {
     const { retrieve = RetrieveType.Full } = params
-    return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, wsCallbacks, options, { filter: isElection })
+    return this.ws.subscribe<ElectionMacroBlock, undefined>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, wsCallbacks, options, { filter: isElection })
   }
 
   /**
@@ -71,13 +72,13 @@ export class BlockchainStream {
    * @param options - Optional WebSocket client options.
    * @returns A promise that resolves with a Subscription object.
    */
-  public subscribeForMicroBlocks<T = MicroBlock, M = undefined>(
+  public subscribeForMicroBlocks(
     params: BlockParams = {},
-    wsCallbacks: WebSocketCallbacks<T, M>,
+    wsCallbacks: WebSocketCallbacks<MicroBlock, undefined>,
     options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS
   ): Promise<Subscription> {
     const { retrieve = RetrieveType.Full } = params
-    return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, wsCallbacks, options, { filter: isMicro })
+    return this.ws.subscribe<MicroBlock, undefined>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, wsCallbacks, options, { filter: isMicro })
   }
 
   /**
@@ -88,13 +89,13 @@ export class BlockchainStream {
    * @param options - Optional WebSocket client options.
    * @returns A promise that resolves with a Subscription object.
    */
-  public subscribeForMacroBlocks<T = MacroBlock, M = undefined>(
+  public subscribeForMacroBlocks(
     params: BlockParams = {},
-    wsCallbacks: WebSocketCallbacks<T, M>,
+    wsCallbacks: WebSocketCallbacks<MacroBlock, undefined>,
     options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS
   ): Promise<Subscription> {
     const { retrieve = RetrieveType.Full } = params || {}
-    return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, wsCallbacks, options, { filter: isMacro })
+    return this.ws.subscribe<MacroBlock, undefined>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, wsCallbacks, options, { filter: isMacro })
   }
 
   /**
@@ -110,7 +111,7 @@ export class BlockchainStream {
     params: BlockParams = {},
     wsCallbacks: WebSocketCallbacks<T, M>,
     options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
-    streamOptions: WebsocketStreamOptions = DEFAULT_STREAM_OPTIONS,
+    streamOptions: WebsocketStreamOptions<T> = DEFAULT_STREAM_OPTIONS,
   ): Promise<Subscription> {
     const { retrieve = RetrieveType.Full } = params
     return this.ws.subscribe<T, M>({ method: 'subscribeForHeadBlock', params: [retrieve === RetrieveType.Full] }, wsCallbacks, options, streamOptions)
@@ -129,7 +130,7 @@ export class BlockchainStream {
     params: ValidatorElectionParams,
     wsCallbacks: WebSocketCallbacks<T, M>,
     options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
-    streamOptions: WebsocketStreamOptions = DEFAULT_STREAM_OPTIONS,
+    streamOptions: WebsocketStreamOptions<T> = DEFAULT_STREAM_OPTIONS,
   ): Promise<Subscription> {
     return this.ws.subscribe<T, M>({ method: 'subscribeForValidatorElectionByAddress', params: [params.address] }, wsCallbacks, options, streamOptions)
   }
@@ -147,7 +148,7 @@ export class BlockchainStream {
     params: LogsParams = {},
     wsCallbacks: WebSocketCallbacks<T, M>,
     options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
-    streamOptions: WebsocketStreamOptions = DEFAULT_STREAM_OPTIONS,
+    streamOptions: WebsocketStreamOptions<T> = DEFAULT_STREAM_OPTIONS,
   ): Promise<Subscription> {
     const { addresses = [], types = [] } = params
     return this.ws.subscribe<T, M>({ method: 'subscribeForLogsByAddressesAndTypes', params: [addresses, types] }, wsCallbacks, options, streamOptions)

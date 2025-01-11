@@ -79,7 +79,7 @@ export class NimiqRPCClient {
     request: RequestArguments,
     wsCallbacks: WebSocketCallbacks<Data, Metadata>,
     options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
-    streamOptions: WebsocketStreamOptions = DEFAULT_STREAM_OPTIONS,
+    streamOptions: WebsocketStreamOptions<Data> = DEFAULT_STREAM_OPTIONS,
   ): Promise<Subscription> {
     return this.ws.subscribe<Data, Metadata>(request, wsCallbacks, options, streamOptions)
   }
