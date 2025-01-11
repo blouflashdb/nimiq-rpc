@@ -18,7 +18,7 @@ export class NetworkClient {
    * @param options - Optional call options.
    * @returns The peer ID.
    */
-  public getPeerId(options = DEFAULT_OPTIONS): Promise<Error | RPCData<string>> {
+  public getPeerId(options = DEFAULT_OPTIONS): Promise<RPCData<string>> {
     return this.client.call<string>({ method: 'getPeerId' }, options)
   }
 
@@ -28,7 +28,7 @@ export class NetworkClient {
    * @param options - Optional call options.
    * @returns The number of peers.
    */
-  public getPeerCount(options = DEFAULT_OPTIONS): Promise<Error | RPCData<number>> {
+  public getPeerCount(options = DEFAULT_OPTIONS): Promise<RPCData<number>> {
     return this.client.call<number>({ method: 'getPeerCount' }, options)
   }
 
@@ -38,7 +38,7 @@ export class NetworkClient {
    * @param options - Optional call options.
    * @returns A list of peer IDs.
    */
-  public getPeerList(options = DEFAULT_OPTIONS): Promise<Error | RPCData<string[]>> {
+  public getPeerList(options = DEFAULT_OPTIONS): Promise<RPCData<string[]>> {
     return this.client.call<string[]>({ method: 'getPeerList' }, options)
   }
 }

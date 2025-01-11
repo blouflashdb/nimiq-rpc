@@ -22,7 +22,7 @@ export class ZkpComponentClient {
    * Returns the latest header number, block number and proof
    * @returns the latest header number, block number and proof
    */
-  public getZkpState(options = DEFAULT_OPTIONS): Promise<Error | RPCData<ZKPStateKebab>> {
+  public getZkpState(options = DEFAULT_OPTIONS): Promise<RPCData<ZKPStateKebab>> {
     return this.client.call<ZKPStateKebab>({ method: 'getZkpState' }, options)
   }
 }

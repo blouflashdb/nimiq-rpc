@@ -27,7 +27,7 @@ export class WalletClient {
    * @param options - Optional call options.
    * @returns The imported key's address.
    */
-  public importRawKey<T = string>({ keyData, passphrase }: ImportKeyParams, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T, undefined>> {
+  public importRawKey<T = string>({ keyData, passphrase }: ImportKeyParams, options = DEFAULT_OPTIONS): Promise<RPCData<T, undefined>> {
     return this.client.call<T>({ method: 'importRawKey', params: [keyData, passphrase] }, options)
   }
 
@@ -38,7 +38,7 @@ export class WalletClient {
    * @param options - Optional call options.
    * @returns Whether the account is imported.
    */
-  public isAccountImported<T = string>(address: string, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+  public isAccountImported<T = string>(address: string, options = DEFAULT_OPTIONS): Promise<RPCData<T>> {
     return this.client.call<T>({ method: 'isAccountImported', params: [address] }, options)
   }
 
@@ -48,7 +48,7 @@ export class WalletClient {
    * @param options - Optional call options.
    * @returns A list of imported accounts.
    */
-  public listAccounts<T = string[]>(options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+  public listAccounts<T = string[]>(options = DEFAULT_OPTIONS): Promise<RPCData<T>> {
     return this.client.call<T>({ method: 'listAccounts' }, options)
   }
 
@@ -59,7 +59,7 @@ export class WalletClient {
    * @param options - Optional call options.
    * @returns Null if the account was successfully locked.
    */
-  public lockAccount<T = null>(address: string, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+  public lockAccount<T = null>(address: string, options = DEFAULT_OPTIONS): Promise<RPCData<T>> {
     return this.client.call<T>({ method: 'lockAccount', params: [address] }, options)
   }
 
@@ -71,7 +71,7 @@ export class WalletClient {
    * @param options - Optional call options.
    * @returns The created account.
    */
-  public createAccount<T = WalletAccount>(p?: CreateAccountParams, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+  public createAccount<T = WalletAccount>(p?: CreateAccountParams, options = DEFAULT_OPTIONS): Promise<RPCData<T>> {
     return this.client.call<T>({ method: 'createAccount', params: [p?.passphrase] }, options)
   }
 
@@ -85,7 +85,7 @@ export class WalletClient {
    * @param options - Optional call options.
    * @returns Whether the account was successfully unlocked.
    */
-  public unlockAccount<T = boolean>(address: string, { passphrase, duration }: UnlockAccountParams, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+  public unlockAccount<T = boolean>(address: string, { passphrase, duration }: UnlockAccountParams, options = DEFAULT_OPTIONS): Promise<RPCData<T>> {
     return this.client.call<T>({ method: 'unlockAccount', params: [address, passphrase, duration] }, options)
   }
 
@@ -96,7 +96,7 @@ export class WalletClient {
    * @param options - Optional call options.
    * @returns Whether the account is unlocked.
    */
-  public isAccountUnlocked<T = boolean>(address: string, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+  public isAccountUnlocked<T = boolean>(address: string, options = DEFAULT_OPTIONS): Promise<RPCData<T>> {
     return this.client.call<T>({ method: 'isAccountUnlocked', params: [address] }, options)
   }
 
@@ -111,7 +111,7 @@ export class WalletClient {
    * @param options - Optional call options.
    * @returns The signature.
    */
-  public sign<T = Signature>({ message, address, passphrase, isHex }: SignParams, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+  public sign<T = Signature>({ message, address, passphrase, isHex }: SignParams, options = DEFAULT_OPTIONS): Promise<RPCData<T>> {
     return this.client.call<T>({ method: 'sign', params: [message, address, passphrase, isHex] }, options)
   }
 
@@ -126,7 +126,7 @@ export class WalletClient {
    * @param options - Optional call options.
    * @returns Whether the signature is valid.
    */
-  public verifySignature<T = boolean>({ message, publicKey, signature, isHex }: VerifySignatureParams, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+  public verifySignature<T = boolean>({ message, publicKey, signature, isHex }: VerifySignatureParams, options = DEFAULT_OPTIONS): Promise<RPCData<T>> {
     return this.client.call<T>({ method: 'verifySignature', params: [message, publicKey, signature, isHex] }, options)
   }
 
@@ -137,7 +137,7 @@ export class WalletClient {
    * @param options - Optional call options.
    * @returns Whether the account was successfully removed.
    */
-  public removeAccount<T = boolean>(address: string, options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+  public removeAccount<T = boolean>(address: string, options = DEFAULT_OPTIONS): Promise<RPCData<T>> {
     return this.client.call<T>({ method: 'removeAccount', params: [address] }, options)
   }
 }

@@ -32,7 +32,7 @@ export class SerdeHelper {
   public serializeToHex(
     { data }: HexSerializationParams,
     options = DEFAULT_OPTIONS,
-  ): Promise<Error | RPCData<string>> {
+  ): Promise<RPCData<string>> {
     return this.client.call<string>({
       method: 'serializeToHex',
       params: [Array.from(data)],

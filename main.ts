@@ -57,7 +57,7 @@ export class NimiqRPCClient {
   call<Data, Metadata = undefined>(
     request: RequestArguments,
     options: HttpOptions = DEFAULT_OPTIONS,
-  ): Promise<RPCData<Data, Metadata> | Error> {
+  ): Promise<RPCData<Data, Metadata>> {
     return this.http.call<Data, Metadata>(request, options)
   }
 

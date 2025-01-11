@@ -20,7 +20,7 @@ export class ValidatorClient {
    * @param options - Optional call options.
    * @returns The validator address.
    */
-  public getAddress<T = string>(options = DEFAULT_OPTIONS): Promise<Error | RPCData<T>> {
+  public getAddress<T = string>(options = DEFAULT_OPTIONS): Promise<RPCData<T>> {
     return this.client.call<T>({ method: 'getAddress' }, options)
   }
 
@@ -30,7 +30,7 @@ export class ValidatorClient {
    * @param options - Optional call options.
    * @returns The validator signing key.
    */
-  public getSigningKey(options = DEFAULT_OPTIONS): Promise<Error | RPCData<string>> {
+  public getSigningKey(options = DEFAULT_OPTIONS): Promise<RPCData<string>> {
     return this.client.call<string>({ method: 'getSigningKey' }, options)
   }
 
@@ -40,7 +40,7 @@ export class ValidatorClient {
    * @param options - Optional call options.
    * @returns The validator voting key.
    */
-  public getVotingKey(options = DEFAULT_OPTIONS): Promise<Error | RPCData<string>> {
+  public getVotingKey(options = DEFAULT_OPTIONS): Promise<RPCData<string>> {
     return this.client.call<string>({ method: 'getVotingKey' }, options)
   }
 
@@ -52,7 +52,7 @@ export class ValidatorClient {
    * @param options - Optional call options.
    * @returns A promise that resolves with null.
    */
-  public setAutomaticReactivation({ automaticReactivation }: SetAutomaticReactivationParams, options = DEFAULT_OPTIONS): Promise<Error | RPCData<null>> {
+  public setAutomaticReactivation({ automaticReactivation }: SetAutomaticReactivationParams, options = DEFAULT_OPTIONS): Promise<RPCData<null>> {
     return this.client.call<null>({ method: 'setAutomaticReactivation', params: [automaticReactivation] }, options)
   }
 
@@ -62,7 +62,7 @@ export class ValidatorClient {
    * @param options - Optional call options.
    * @returns A boolean indicating whether the validator is elected.
    */
-  public isElected(options = DEFAULT_OPTIONS): Promise<Error | RPCData<boolean>> {
+  public isElected(options = DEFAULT_OPTIONS): Promise<RPCData<boolean>> {
     return this.client.call<boolean>({ method: 'isValidatorElected' }, options)
   }
 
@@ -72,7 +72,7 @@ export class ValidatorClient {
    * @param options - Optional call options.
    * @returns A boolean indicating whether the validator is synced.
    */
-  public isSynced(options = DEFAULT_OPTIONS): Promise<Error | RPCData<boolean>> {
+  public isSynced(options = DEFAULT_OPTIONS): Promise<RPCData<boolean>> {
     return this.client.call<boolean>({ method: 'isValidatorSynced' }, options)
   }
 }

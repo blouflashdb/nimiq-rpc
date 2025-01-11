@@ -1,7 +1,7 @@
 import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
 import type { IJSONRPCResponse } from '@open-rpc/client-js/build/Request'
 import type { RPCData } from '../types/index.ts'
-import { Client, HTTPTransport, JSONRPCError, RequestManager } from '@open-rpc/client-js'
+import { Client, HTTPTransport, RequestManager } from '@open-rpc/client-js'
 
 export interface HttpOptions {
   timeout?: number // in ms
@@ -55,17 +55,9 @@ export class HttpClient {
   >(
     request: RequestArguments,
     options: HttpOptions,
-  ): Promise<RPCData<Data, Metadata> | Error> {
-    try {
+  ): Promise<RPCData<Data, Metadata>> {
       const result = await this.client.request(request, options.timeout)
       const data = result as IJSONRPCResponse
       return data.result as RPCData<Data, Metadata>
-    }
-    catch (error: unknown) {
-      if (error instanceof JSONRPCError) {
-        return new Error(error.message)
-      }
-      return new Error('Unknown error')
-    }
   }
 }
