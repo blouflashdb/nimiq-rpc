@@ -36,6 +36,9 @@ export interface SubscribeForLogsByAddressesAndTypesParams {
   types?: LogType[]
 }
 
+/**
+ * BlockchainClient class provides methods to interact with the blockchain.
+ */
 export class BlockchainClient {
   private client: HttpClient
 
