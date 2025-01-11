@@ -1,5 +1,4 @@
 import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
-import type { IJSONRPCResponse } from '@open-rpc/client-js/build/Request'
 import type { RPCData } from '../types/index.ts'
 import { Client, HTTPTransport, RequestManager } from '@open-rpc/client-js'
 
@@ -49,19 +48,13 @@ export class HttpClient {
    * @param options - The HTTP options for the call. Defaults to DEFAULT_OPTIONS if not provided.
    * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
-  async call<
+  call<
     Data,
     Metadata = undefined,
   >(
     request: RequestArguments,
     options: HttpOptions,
   ): Promise<RPCData<Data, Metadata>> {
-    try {
-      const result = await this.client.request(request, options.timeout)
-      const data = result as IJSONRPCResponse
-      return Promise.resolve(data.result)
-    } catch (error) {
-      return Promise.reject(error)
-    }
+    return this.client.request(request, options.timeout)
   }
 }
