@@ -8,6 +8,19 @@ A fully typed Nimiq RPC client for Nodejs and Deno.
 
 ## How to use
 
+### Installation
+deno:
+
+`deno add jsr:@blouflash/nimiq-rpc`
+
+npm:
+
+`npx jsr add @blouflash/nimiq-rpc`
+
+pnpm: 
+
+`pnpm dlx jsr add @blouflash/nimiq-rpc`
+
 ### Usage
 
 It is structured the same way as the [`Rust RPC Client`](https://github.com/nimiq/core-rs-albatross/tree/albatross/rpc-server/src/dispatchers)
@@ -15,14 +28,44 @@ It is structured the same way as the [`Rust RPC Client`](https://github.com/nimi
 ```typescript
 import { NimiqRPCClient } from '@blouflash/nimiq-rpc'
 
-const url = 'NODE_URL'
-const client = new NimiqRPCClient(new URL(url))
-const { data: currentEpoch, error: errorCurrentEpoch } = await client.blockchain.getEpochNumber()
-if (errorCurrentEpoch || !currentEpoch)
-  throw new Error(errorCurrentEpoch?.message || 'No current epoch')
+const client = new NimiqRPCClient("http://localhost:8648");
 
-client.blockchain.getBlockNumber()
-client.network.getPeerCount()
+// async/await based example http call
+try {
+  const result = await client.blockchain.getEpochNumber();
+  console.log("Result:", result);
+} catch (error) {
+  if (error instanceof JSONRPCError) {
+    console.error("JSON-RPC Error:", error);
+  } else {
+    console.error("An unknown error occurred:", error);
+  }
+}
+
+// Promise based example http call
+client.blockchain.getBlockNumber().then((result) => {
+  console.log("Result:", result);
+}).catch((error) => {
+  if (error instanceof JSONRPCError) {
+    console.error("JSON-RPC Error:", error);
+  } else {
+    console.error("An unknown error occurred:", error);
+  }
+});
+
+// async/await based example ws stream call
+try {
+  const subscription = await client.blockchainStreams.subscribeForBlocks();
+  subscription.next((result) => {
+    if (result instanceof JSONRPCError) {
+      console.error("JSON-RPC Error:", result);
+      return;
+    }
+    console.log("Result:", result);
+  });
+} catch (error) {
+  console.error("An unknown error occurred:", error);
+}
 ```
 
 ## License
