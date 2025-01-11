@@ -54,18 +54,25 @@ client.blockchain.getBlockNumber().then((result) => {
 });
 
 // async/await based example ws stream call
-try {
-  const subscription = await client.blockchainStreams.subscribeForBlocks();
-  subscription.next((result) => {
-    if (result instanceof JSONRPCError) {
-      console.error("JSON-RPC Error:", result);
-      return;
-    }
-    console.log("Result:", result);
-  });
-} catch (error) {
-  console.error("An unknown error occurred:", error);
-}
+const subscribtion = await client.blockchainStreams.subscribeForBlockHashes(
+  {
+    onMessage: (result) => {
+      console.log("onMessage", result);
+    },
+    onError: (error) => {
+      console.error("onError", error);
+    },
+    onConnectionError: (error) => {
+      console.error("onConnectionError", error);
+    },
+  },
+  { maxReconnects: 5, reconnectTimeout: 1000, callTimeout: 10000 }, // optional
+  { filter: (_data) => true }, // optional
+);
+
+console.log(subscribtion.getSubscriptionId());
+
+subscribtion.close();
 ```
 
 ## License
