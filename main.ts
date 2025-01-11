@@ -6,6 +6,9 @@ import { DEFAULT_OPTIONS, HttpClient } from './src/client/http.ts'
 import { WebSocketClient } from './src/client/web-socket.ts'
 import * as Modules from './src/modules/index.ts'
 
+/**
+ * NimiqRPCClient class provides methods to interact with the Nimiq Albatross Node.
+ */
 export class NimiqRPCClient {
   public http: HttpClient
   public ws: WebSocketClient
