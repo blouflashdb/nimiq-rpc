@@ -32,3 +32,6 @@ jobs:
 
       - name: Run linter
         run: deno lint
+
+      - name: Run typechecker
+        run: deno check main.ts
