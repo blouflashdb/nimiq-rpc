@@ -11,6 +11,9 @@ export interface SupplyAtParams {
   currentTime: number
 }
 
+/**
+ * PolicyClient class provides methods to interact with the Nimiq Albatross Node's policy.
+ */
 export class PolicyClient {
   private client: HttpClient
 
@@ -23,7 +26,8 @@ export class PolicyClient {
    *
    * RPC method name: "getPolicyConstants"
    *
-   * @param options
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the policy constants.
    */
   public getPolicyConstants(options = DEFAULT_OPTIONS): Promise<Error | RPCData<PolicyConstants>> {
     return this.client.call<PolicyConstants>(
@@ -37,8 +41,9 @@ export class PolicyClient {
    *
    * RPC method name: "getEpochAt"
    *
-   * @param blockNumber
-   * @param options
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the epoch number.
    */
   public getEpochAt(blockNumber: number, options = DEFAULT_OPTIONS): Promise<Error | RPCData<number>> {
     return this.client.call<number>({
@@ -53,9 +58,9 @@ export class PolicyClient {
    *
    * RPC method name: "getEpochIndexAt"
    *
-   * @param blockNumber
-   * @param options
-   * @returns The epoch index at a given block number.
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the epoch index at a given block number.
    */
   public getEpochIndexAt(
     blockNumber: number,
@@ -72,9 +77,9 @@ export class PolicyClient {
    *
    * RPC method name: "getBatchAt"
    *
-   * @param blockNumber
-   * @param options
-   * @returns The batch number at a given `block_number` (height)
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the batch number at a given `block_number` (height).
    */
   public getBatchAt(blockNumber: number, options = DEFAULT_OPTIONS): Promise<Error | RPCData<number>> {
     return this.client.call<number>({
@@ -89,9 +94,9 @@ export class PolicyClient {
    *
    * RPC method name: "getBatchIndexAt"
    *
-   * @param blockNumber
-   * @param options
-   * @returns The batch index at a given block number.
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the batch index at a given block number.
    */
   public getBatchIndexAt(
     blockNumber: number,
@@ -108,8 +113,9 @@ export class PolicyClient {
    *
    * RPC method name: "getElectionBlockAfter"
    *
-   * @param blockNumber
-   * @returns The number (height) of the next election macro block after a given block number (height).
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the number (height) of the next election macro block after a given block number (height).
    */
   public getElectionBlockAfter(
     blockNumber: number,
@@ -127,9 +133,9 @@ export class PolicyClient {
    *
    * RPC method name: "getElectionBlockBefore"
    *
-   * @param blockNumber
-   * @param options
-   * @returns The block number (height) of the preceding election macro block before a given block number (height).
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the block number (height) of the preceding election macro block before a given block number (height).
    */
   public getElectionBlockBefore(
     blockNumber: number,
@@ -147,9 +153,9 @@ export class PolicyClient {
    *
    * RPC method name: "getLastElectionBlock"
    *
-   * @param blockNumber
-   * @param options
-   * @returns The block number (height) of the last election macro block at a given block number (height).
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the block number (height) of the last election macro block at a given block number (height).
    */
   public getLastElectionBlock(
     blockNumber: number,
@@ -166,9 +172,9 @@ export class PolicyClient {
    *
    * RPC method name: "isElectionBlockAt"
    *
-   * @param blockNumber The block number (height) to query.
-   * @parm options
-   * @returns A boolean expressing if the block at a given block number (height) is an election macro block.
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with a boolean expressing if the block at a given block number (height) is an election macro block.
    */
   public isElectionBlockAt(
     blockNumber: number,
@@ -185,8 +191,9 @@ export class PolicyClient {
    *
    * RPC method name: "getMacroBlockAfter"
    *
-   * @param blockNumber The block number (height) to query.
-   * @returns The block number (height) of the next macro block after a given block number (height).
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the block number (height) of the next macro block after a given block number (height).
    */
   public getMacroBlockAfter(
     blockNumber: number,
@@ -203,8 +210,9 @@ export class PolicyClient {
    *
    * RPC method name: "getMacroBlockBefore"
    *
-   * @param blockNumber The block number (height) to query.
-   * @returns The block number (height) of the preceding macro block before a given block number (height).
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the block number (height) of the preceding macro block before a given block number (height).
    */
   public getMacroBlockBefore(
     blockNumber: number,
@@ -222,8 +230,9 @@ export class PolicyClient {
    *
    * RPC method name: "getLastMacroBlock"
    *
-   * @param blockNumber The block number (height) to query.
-   * @returns The block number (height) of the last macro block at a given block number (height).
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the block number (height) of the last macro block at a given block number (height).
    */
   public getLastMacroBlock(
     blockNumber: number,
@@ -240,8 +249,9 @@ export class PolicyClient {
    *
    * RPC method name: "isMacroBlockAt"
    *
-   * @param blockNumber The block number (height) to query.
-   * @returns A boolean expressing if the block at a given block number (height) is a macro block.
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with a boolean expressing if the block at a given block number (height) is a macro block.
    */
   public isMacroBlockAt(
     blockNumber: number,
@@ -258,9 +268,9 @@ export class PolicyClient {
    *
    * RPC method name: "isMicroBlockAt"
    *
-   * @param blockNumber
-   * @param options
-   * @returns The block number (height) of the next micro block after a given block number (height).
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the block number (height) of the next micro block after a given block number (height).
    */
   public isMicroBlockAt(
     blockNumber: number,
@@ -275,9 +285,9 @@ export class PolicyClient {
    *
    * RPC method name: "getFirstBlockOf"
    *
-   * @param epochIndex
-   * @param options
-   * @returns The block number (height) of the first block of the given epoch (which is always a micro block).
+   * @param epochIndex - The epoch index to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the block number (height) of the first block of the given epoch (which is always a micro block).
    */
   public getFirstBlockOfEpoch(
     epochIndex: number,
@@ -292,8 +302,9 @@ export class PolicyClient {
    *
    * RPC method name: "getBlockAfterReportingWindow"
    *
-   * @param blockNumber
-   * @returns The block number of the first block of the given reporting window (which is always a micro block).
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the block number of the first block of the given reporting window (which is always a micro block).
    */
   public getBlockAfterReportingWindow(
     blockNumber: number,
@@ -308,8 +319,9 @@ export class PolicyClient {
    *
    * RPC method name: "getBlockAfterJail"
    *
-   * @param blockNumber
-   * @returns The block number of the first block of the given jail (which is always a micro block).
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the block number of the first block of the given jail (which is always a micro block).
    */
   public getBlockAfterJail(
     blockNumber: number,
@@ -324,9 +336,9 @@ export class PolicyClient {
    *
    * RPC method name: "getFirstBlockOfBatch"
    *
-   * @param batchIndex
-   * @param options
-   * @returns The block number of the first block of the given batch (which is always a micro block).
+   * @param batchIndex - The batch index to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the block number of the first block of the given batch (which is always a micro block).
    */
   public getFirstBlockOfBatch(
     batchIndex: number,
@@ -341,9 +353,9 @@ export class PolicyClient {
    *
    * RPC method name: "getElectionBlockOf"
    *
-   * @param epochIndex
-   * @param options
-   * @returns The block number of the election macro block of the given epoch (which is always the last block).
+   * @param epochIndex - The epoch index to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the block number of the election macro block of the given epoch (which is always the last block).
    */
   public getElectionBlockOfEpoch(
     epochIndex: number,
@@ -358,9 +370,9 @@ export class PolicyClient {
    *
    * RPC method name: "getMacroBlockOf"
    *
-   * @param batchIndex
-   * @param options
-   * @returns The block number of the macro block (checkpoint or election) of the given batch (which is always the last block).
+   * @param batchIndex - The batch index to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the block number of the macro block (checkpoint or election) of the given batch (which is always the last block).
    */
   public getMacroBlockOfBatch(
     batchIndex: number,
@@ -376,9 +388,9 @@ export class PolicyClient {
    *
    * RPC method name: "getFirstBatchOfEpoch"
    *
-   * @param blockNumber
-   * @param options
-   * @returns A boolean expressing if the batch at a given block number (height) is the first batch
+   * @param blockNumber - The block number (height) to query.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with a boolean expressing if the batch at a given block number (height) is the first batch.
    */
   public getFirstBatchOfEpoch(
     blockNumber: number,
@@ -397,11 +409,12 @@ export class PolicyClient {
    *
    * RPC method name: "getSupplyAt"
    *
-   * @param params
-   * @param params.genesisSupply supply at genesis
-   * @param params.genesisTime timestamp of genesis block
-   * @param params.currentTime timestamp to calculate supply at
-   * @returns The supply at a given time (as Unix time) in Lunas (1 NIM = 100,000 Lunas).
+   * @param params - The parameters for calculating the supply.
+   * @param params.genesisSupply - The supply at genesis.
+   * @param params.genesisTime - The timestamp of the genesis block.
+   * @param params.currentTime - The timestamp to calculate supply at.
+   * @param options - Optional call options.
+   * @returns A promise that resolves with the supply at a given time (as Unix time) in Lunas (1 NIM = 100,000 Lunas).
    */
   public getSupplyAt(
     { genesisSupply, genesisTime, currentTime }: SupplyAtParams,

@@ -21,9 +21,15 @@ export const DEFAULT_OPTIONS_SEND_TX: SendTxCallOptions = {
   timeout: DEFAULT_TIMEOUT_CONFIRMATION,
 }
 
+/**
+ * HttpClient class provides methods to interact with the Nimiq Albatross Node over HTTP.
+ */
 export class HttpClient {
   private client: Client
 
+  /**
+   * @param url Node URL
+   */
   constructor(url: string) {
     const transport = new HTTPTransport(url, {
       headers: {
@@ -34,6 +40,15 @@ export class HttpClient {
     this.client = new Client(new RequestManager([transport]))
   }
 
+  /**
+   * Make a raw call to the Albatross Node.
+   *
+   * @param request - The request object containing the following properties:
+   * @param request.method - The name of the method to call.
+   * @param request.params - The parameters to pass with the call, if any.
+   * @param options - The HTTP options for the call. Defaults to DEFAULT_OPTIONS if not provided.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
+   */
   async call<
     Data,
     Metadata = undefined,

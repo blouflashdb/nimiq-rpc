@@ -12,6 +12,9 @@ export interface PushTransactionParams {
 }
 export interface MempoolContentParams { includeTransactions: boolean }
 
+/**
+ * MempoolClient class provides methods to interact with the Nimiq Albatross Node's mempool.
+ */
 export class MempoolClient {
   private client: HttpClient
 

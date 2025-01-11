@@ -8,6 +8,9 @@ interface ZKPStateKebab {
   'latest-proof'?: string
 }
 
+/**
+ * ZkpComponentClient class provides methods to interact with the Nimiq Albatross Node's ZKP component.
+ */
 export class ZkpComponentClient {
   private client: HttpClient
 

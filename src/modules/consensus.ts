@@ -26,6 +26,9 @@ export type DeleteValidatorTxParams = { validator: string, recipient: string, fe
 
 export interface TxLog { tx: Transaction, log?: BlockLog, hash: string }
 
+/**
+ * ConsensusClient class provides methods to interact with the consensus layer of the blockchain.
+ */
 export class ConsensusClient {
   private client: HttpClient
 
@@ -39,6 +42,9 @@ export class ConsensusClient {
 
   /**
    * Returns a boolean specifying if we have established consensus with the network
+   *
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public isConsensusEstablished<T = boolean>(options = DEFAULT_OPTIONS): Promise<RPCData<T> | Error> {
     return this.client.call<T>({ method: 'isConsensusEstablished' }, options)
@@ -46,6 +52,11 @@ export class ConsensusClient {
 
   /**
    * Given a serialized transaction, it will return the corresponding transaction struct
+   *
+   * @param params - The parameters for the raw transaction info.
+   * @param params.rawTransaction - The serialized transaction.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public getRawTransactionInfo<T = Transaction>({ rawTransaction }: RawTransactionInfoParams, options = DEFAULT_OPTIONS): Promise<RPCData<T> | Error> {
     return this.client.call<T>({ method: 'getRawTransactionInfo', params: [rawTransaction] }, options)
@@ -53,6 +64,11 @@ export class ConsensusClient {
 
   /**
    * Sends a raw transaction to the network
+   *
+   * @param params - The parameters for the raw transaction.
+   * @param params.rawTransaction - The serialized transaction.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendRawTransaction<T = string>({ rawTransaction }: RawTransactionInfoParams, options = DEFAULT_OPTIONS): Promise<RPCData<T> | Error> {
     return this.client.call<T>({ method: 'sendRawTransaction', params: [rawTransaction] }, options)
@@ -60,6 +76,15 @@ export class ConsensusClient {
 
   /**
    * Creates a serialized transaction
+   *
+   * @param params - The parameters for the transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.recipient - The recipient address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param params.data - Optional data to include in the transaction.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createTransaction<T = string>(p: TransactionParams, options = DEFAULT_OPTIONS): Promise<RPCData<T> | Error> {
     if (p.data) {
@@ -74,6 +99,15 @@ export class ConsensusClient {
 
   /**
    * Sends a transaction
+   *
+   * @param params - The parameters for the transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.recipient - The recipient address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param params.data - Optional data to include in the transaction.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendTransaction<T = string>(p: TransactionParams, options = DEFAULT_OPTIONS): Promise<RPCData<T> | Error> {
     const req = p.data
@@ -84,6 +118,15 @@ export class ConsensusClient {
 
   /**
    * Sends a transaction and waits for confirmation
+   *
+   * @param params - The parameters for the transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.recipient - The recipient address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param params.data - Optional data to include in the transaction.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncTransaction<T = string>(p: TransactionParams, options: SendTxCallOptions): Promise<RPCData<T> | Error> {
     return this.sendTransaction<T>(p, options)
@@ -92,6 +135,17 @@ export class ConsensusClient {
 
   /**
    * Returns a serialized transaction creating a new vesting contract
+   *
+   * @param params - The parameters for the vesting transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.owner - The owner address.
+   * @param params.startTime - The start time of the vesting.
+   * @param params.timeStep - The time step for the vesting.
+   * @param params.numSteps - The number of steps for the vesting.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createNewVestingTransaction<T = string>(p: VestingTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<T> | Error> {
     const req = { method: 'createNewVestingTransaction', params: [p.wallet, p.owner, p.startTime, p.timeStep, p.numSteps, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -100,6 +154,17 @@ export class ConsensusClient {
 
   /**
    * Sends a transaction creating a new vesting contract to the network
+   *
+   * @param params - The parameters for the vesting transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.owner - The owner address.
+   * @param params.startTime - The start time of the vesting.
+   * @param params.timeStep - The time step for the vesting.
+   * @param params.numSteps - The number of steps for the vesting.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendNewVestingTransaction<T = string>(p: VestingTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<T> | Error> {
     const req = { method: 'sendNewVestingTransaction', params: [p.wallet, p.owner, p.startTime, p.timeStep, p.numSteps, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -108,6 +173,17 @@ export class ConsensusClient {
 
   /**
    * Sends a transaction creating a new vesting contract to the network and waits for confirmation
+   *
+   * @param params - The parameters for the vesting transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.owner - The owner address.
+   * @param params.startTime - The start time of the vesting.
+   * @param params.timeStep - The time step for the vesting.
+   * @param params.numSteps - The number of steps for the vesting.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncNewVestingTransaction(p: VestingTxParams, options: SendTxCallOptions): Promise<RPCData<string> | Error> {
     return this.sendNewVestingTransaction(p, options)
@@ -116,6 +192,15 @@ export class ConsensusClient {
 
   /**
    * Returns a serialized transaction redeeming a vesting contract
+   *
+   * @param params - The parameters for the redeem vesting transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.contractAddress - The contract address.
+   * @param params.recipient - The recipient address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createRedeemVestingTransaction(p: RedeemVestingTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRedeemVestingTransaction', params: [p.wallet, p.contractAddress, p.recipient, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -124,6 +209,15 @@ export class ConsensusClient {
 
   /**
    * Sends a transaction redeeming a vesting contract
+   *
+   * @param params - The parameters for the redeem vesting transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.contractAddress - The contract address.
+   * @param params.recipient - The recipient address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendRedeemVestingTransaction(p: RedeemVestingTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRedeemVestingTransaction', params: [p.wallet, p.contractAddress, p.recipient, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -132,6 +226,15 @@ export class ConsensusClient {
 
   /**
    * Sends a transaction redeeming a vesting contract and waits for confirmation
+   *
+   * @param params - The parameters for the redeem vesting transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.contractAddress - The contract address.
+   * @param params.recipient - The recipient address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncRedeemVestingTransaction(p: RedeemVestingTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRedeemVestingTransaction(p, options)
@@ -140,6 +243,18 @@ export class ConsensusClient {
 
   /**
    * Returns a serialized transaction creating a new HTLC contract
+   *
+   * @param params - The parameters for the HTLC transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.htlcSender - The HTLC sender address.
+   * @param params.htlcRecipient - The HTLC recipient address.
+   * @param params.hashRoot - The hash root.
+   * @param params.hashCount - The hash count.
+   * @param params.timeout - The timeout value.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createNewHtlcTransaction(p: HtlcTransactionParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createNewHtlcTransaction', params: [p.wallet, p.htlcSender, p.htlcRecipient, p.hashRoot, p.hashCount, p.timeout, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -148,6 +263,18 @@ export class ConsensusClient {
 
   /**
    * Sends a transaction creating a new HTLC contract
+   *
+   * @param params - The parameters for the HTLC transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.htlcSender - The HTLC sender address.
+   * @param params.htlcRecipient - The HTLC recipient address.
+   * @param params.hashRoot - The hash root.
+   * @param params.hashCount - The hash count.
+   * @param params.timeout - The timeout value.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendNewHtlcTransaction(p: HtlcTransactionParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendNewHtlcTransaction', params: [p.wallet, p.htlcSender, p.htlcRecipient, p.hashRoot, p.hashCount, p.timeout, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -156,6 +283,18 @@ export class ConsensusClient {
 
   /**
    * Sends a transaction creating a new HTLC contract and waits for confirmation
+   *
+   * @param params - The parameters for the HTLC transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.htlcSender - The HTLC sender address.
+   * @param params.htlcRecipient - The HTLC recipient address.
+   * @param params.hashRoot - The hash root.
+   * @param params.hashCount - The hash count.
+   * @param params.timeout - The timeout value.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncNewHtlcTransaction(p: HtlcTransactionParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendNewHtlcTransaction(p, options)
@@ -164,6 +303,18 @@ export class ConsensusClient {
 
   /**
    * Returns a serialized transaction redeeming an HTLC contract
+   *
+   * @param params - The parameters for the redeem HTLC transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.contractAddress - The contract address.
+   * @param params.recipient - The recipient address.
+   * @param params.preImage - The pre-image.
+   * @param params.hashRoot - The hash root.
+   * @param params.hashCount - The hash count.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createRedeemRegularHtlcTransaction(p: RedeemRegularHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRedeemRegularHtlcTransaction', params: [p.wallet, p.contractAddress, p.recipient, p.preImage, p.hashRoot, p.hashCount, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -172,6 +323,18 @@ export class ConsensusClient {
 
   /**
    * Sends a transaction redeeming an HTLC contract
+   *
+   * @param params - The parameters for the redeem HTLC transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.contractAddress - The contract address.
+   * @param params.recipient - The recipient address.
+   * @param params.preImage - The pre-image.
+   * @param params.hashRoot - The hash root.
+   * @param params.hashCount - The hash count.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendRedeemRegularHtlcTransaction(p: RedeemRegularHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRedeemRegularHtlcTransaction', params: [p.wallet, p.contractAddress, p.recipient, p.preImage, p.hashRoot, p.hashCount, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -180,6 +343,18 @@ export class ConsensusClient {
 
   /**
    * Sends a transaction redeeming a new HTLC contract and waits for confirmation
+   *
+   * @param params - The parameters for the redeem HTLC transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.contractAddress - The contract address.
+   * @param params.recipient - The recipient address.
+   * @param params.preImage - The pre-image.
+   * @param params.hashRoot - The hash root.
+   * @param params.hashCount - The hash count.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncRedeemRegularHtlcTransaction(p: RedeemRegularHtlcTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRedeemRegularHtlcTransaction(p, options)
@@ -189,6 +364,15 @@ export class ConsensusClient {
   /**
    * Returns a serialized transaction redeeming a HTLC contract using the `TimeoutResolve`
    * method
+   *
+   * @param params - The parameters for the redeem HTLC transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.contractAddress - The contract address.
+   * @param params.recipient - The recipient address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createRedeemTimeoutHtlcTransaction(p: RedeemTimeoutHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRedeemRegularHtlcTransaction', params: [p.wallet, p.contractAddress, p.recipient, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -198,6 +382,15 @@ export class ConsensusClient {
   /**
    * Sends a transaction redeeming a HTLC contract using the `TimeoutResolve`
    * method to network
+   *
+   * @param params - The parameters for the redeem HTLC transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.contractAddress - The contract address.
+   * @param params.recipient - The recipient address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendRedeemTimeoutHtlcTransaction(p: RedeemTimeoutHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRedeemRegularHtlcTransaction', params: [p.wallet, p.contractAddress, p.recipient, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -207,6 +400,15 @@ export class ConsensusClient {
   /**
    * Sends a transaction redeeming a HTLC contract using the `TimeoutResolve`
    * method to network and waits for confirmation
+   *
+   * @param params - The parameters for the redeem HTLC transaction.
+   * @param params.wallet - The wallet address.
+   * @param params.contractAddress - The contract address.
+   * @param params.recipient - The recipient address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncRedeemTimeoutHtlcTransaction(p: RedeemTimeoutHtlcTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRedeemTimeoutHtlcTransaction(p, options)
@@ -216,6 +418,16 @@ export class ConsensusClient {
   /**
    * Returns a serialized transaction redeeming a HTLC contract using the `EarlyResolve`
    * method.
+   *
+   * @param params - The parameters for the redeem HTLC transaction.
+   * @param params.contractAddress - The contract address.
+   * @param params.recipient - The recipient address.
+   * @param params.htlcSenderSignature - The HTLC sender signature.
+   * @param params.htlcRecipientSignature - The HTLC recipient signature.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createRedeemEarlyHtlcTransaction(p: RedeemEarlyHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRedeemEarlyHtlcTransaction', params: [p.contractAddress, p.recipient, p.htlcSenderSignature, p.htlcRecipientSignature, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -225,6 +437,16 @@ export class ConsensusClient {
   /**
    * Sends a transaction redeeming a HTLC contract using the `EarlyResolve`
    * method.
+   *
+   * @param params - The parameters for the redeem HTLC transaction.
+   * @param params.contractAddress - The contract address.
+   * @param params.recipient - The recipient address.
+   * @param params.htlcSenderSignature - The HTLC sender signature.
+   * @param params.htlcRecipientSignature - The HTLC recipient signature.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendRedeemEarlyHtlcTransaction(p: RedeemEarlyHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRedeemEarlyHtlcTransaction', params: [p.contractAddress, p.recipient, p.htlcSenderSignature, p.htlcRecipientSignature, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -234,6 +456,16 @@ export class ConsensusClient {
   /**
    * Sends a transaction redeeming a HTLC contract using the `EarlyResolve`
    * method and waits for confirmation
+   *
+   * @param params - The parameters for the redeem HTLC transaction.
+   * @param params.contractAddress - The contract address.
+   * @param params.recipient - The recipient address.
+   * @param params.htlcSenderSignature - The HTLC sender signature.
+   * @param params.htlcRecipientSignature - The HTLC recipient signature.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncRedeemEarlyHtlcTransaction(p: RedeemEarlyHtlcTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRedeemEarlyHtlcTransaction(p, options)
@@ -243,6 +475,16 @@ export class ConsensusClient {
   /**
    * Returns a serialized signature that can be used to redeem funds from a HTLC contract using
    * the `EarlyResolve` method.
+   *
+   * @param params - The parameters for the redeem HTLC transaction.
+   * @param params.contractAddress - The contract address.
+   * @param params.recipient - The recipient address.
+   * @param params.htlcSenderSignature - The HTLC sender signature.
+   * @param params.htlcRecipientSignature - The HTLC recipient signature.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public signRedeemEarlyHtlcTransaction(p: RedeemEarlyHtlcTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'signRedeemEarlyHtlcTransaction', params: [p.contractAddress, p.recipient, p.htlcSenderSignature, p.htlcRecipientSignature, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -252,6 +494,15 @@ export class ConsensusClient {
   /**
    * Returns a serialized `new_staker` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
+   *
+   * @param params - The parameters for the new staker transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.delegation - The delegation address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createNewStakerTransaction(p: CreateStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createNewStakerTransaction', params: [p.senderWallet, p.stakerWallet, p.delegation, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -261,6 +512,15 @@ export class ConsensusClient {
   /**
    * Sends a `new_staker` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
+   *
+   * @param params - The parameters for the new staker transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.delegation - The delegation address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendNewStakerTransaction(p: CreateStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendNewStakerTransaction', params: [p.senderWallet, p.stakerWallet, p.delegation, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -270,6 +530,15 @@ export class ConsensusClient {
   /**
    * Sends a `new_staker` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee and waits for confirmation.
+   *
+   * @param params - The parameters for the new staker transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.delegation - The delegation address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncNewStakerTransaction(p: CreateStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendNewStakerTransaction(p, options)
@@ -279,6 +548,14 @@ export class ConsensusClient {
   /**
    * Returns a serialized `stake` transaction. The funds to be staked and the transaction fee will
    * be paid from the `sender_wallet`.
+   *
+   * @param params - The parameters for the stake transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createStakeTransaction(p: StakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createStakeTransaction', params: [p.senderWallet, p.stakerWallet, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -288,6 +565,14 @@ export class ConsensusClient {
   /**
    * Sends a `stake` transaction. The funds to be staked and the transaction fee will
    * be paid from the `sender_wallet`.
+   *
+   * @param params - The parameters for the stake transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendStakeTransaction(p: StakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendStakeTransaction', params: [p.senderWallet, p.stakerWallet, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -297,6 +582,14 @@ export class ConsensusClient {
   /**
    * Sends a `stake` transaction. The funds to be staked and the transaction fee will
    * be paid from the `sender_wallet` and waits for confirmation.
+   *
+   * @param params - The parameters for the stake transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncStakeTransaction(p: StakeTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendStakeTransaction(p, options)
@@ -307,6 +600,15 @@ export class ConsensusClient {
    * Returns a serialized `update_staker` transaction. You can pay the transaction fee from a basic
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet).
+   *
+   * @param params - The parameters for the update staker transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.newDelegation - The new delegation address.
+   * @param params.newInactiveBalance - The new inactive balance.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createUpdateStakerTransaction(p: UpdateStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createUpdateStakerTransaction', params: [p.senderWallet, p.stakerWallet, p.newDelegation, p.newInactiveBalance, p.fee, this.getValidityStartHeight(p)] }
@@ -317,6 +619,15 @@ export class ConsensusClient {
    * Sends a `update_staker` transaction. You can pay the transaction fee from a basic
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet).
+   *
+   * @param params - The parameters for the update staker transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.newDelegation - The new delegation address.
+   * @param params.newInactiveBalance - The new inactive balance.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendUpdateStakerTransaction(p: UpdateStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendUpdateStakerTransaction', params: [p.senderWallet, p.stakerWallet, p.newDelegation, p.newInactiveBalance, p.fee, this.getValidityStartHeight(p)] }
@@ -327,6 +638,15 @@ export class ConsensusClient {
    * Sends a `update_staker` transaction. You can pay the transaction fee from a basic
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet) and waits for confirmation.
+   *
+   * @param params - The parameters for the update staker transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.newDelegation - The new delegation address.
+   * @param params.newInactiveBalance - The new inactive balance.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncUpdateStakerTransaction(p: UpdateStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendUpdateStakerTransaction(p, options)
@@ -337,6 +657,14 @@ export class ConsensusClient {
    * Returns a serialized `set_active_stake` transaction. You can pay the transaction fee from a basic
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet).
+   *
+   * @param params - The parameters for the set active stake transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.newActiveBalance - The new active balance.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createSetActiveStakeTransaction(p: SetActiveStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createSetActiveStakeTransaction', params: [p.senderWallet, p.stakerWallet, p.newActiveBalance, p.fee, this.getValidityStartHeight(p)] }
@@ -347,6 +675,14 @@ export class ConsensusClient {
    * Sends a `set_active_stake` transaction. You can pay the transaction fee from a basic
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet).
+   *
+   * @param params - The parameters for the set active stake transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.newActiveBalance - The new active balance.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSetActiveStakeTransaction(p: SetActiveStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendSetActiveStakeTransaction', params: [p.senderWallet, p.stakerWallet, p.newActiveBalance, p.fee, this.getValidityStartHeight(p)] }
@@ -357,6 +693,14 @@ export class ConsensusClient {
    * Sends a `set_active_stake` transaction. You can pay the transaction fee from a basic
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet) and waits for confirmation.
+   *
+   * @param params - The parameters for the set active stake transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.newActiveBalance - The new active balance.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncSetActiveStakeTransaction(p: SetActiveStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendSetActiveStakeTransaction(p, options)
@@ -367,6 +711,14 @@ export class ConsensusClient {
    * Returns a serialized `retire_stake` transaction. You can pay the transaction fee from a basic
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet).
+   *
+   * @param params - The parameters for the retire stake transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.retireStake - The retire stake value.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createRetireStakeTransaction(p: CreateRetireStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRetireStakeTransaction', params: [p.senderWallet, p.stakerWallet, p.retireStake, p.fee, this.getValidityStartHeight(p)] }
@@ -377,6 +729,14 @@ export class ConsensusClient {
    * Sends a `retire_stake` transaction. You can pay the transaction fee from a basic
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet).
+   *
+   * @param params - The parameters for the retire stake transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.retireStake - The retire stake value.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendRetireStakeTransaction(p: CreateRetireStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRetireStakeTransaction', params: [p.senderWallet, p.stakerWallet, p.retireStake, p.fee, this.getValidityStartHeight(p)] }
@@ -387,6 +747,14 @@ export class ConsensusClient {
    * Sends a `retire_stake` transaction. You can pay the transaction fee from a basic
    * account (by providing the sender wallet) or from the staker account's balance (by not
    * providing a sender wallet) and waits for confirmation.
+   *
+   * @param params - The parameters for the retire stake transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.retireStake - The retire stake value.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncRetireStakeTransaction(p: CreateRetireStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRetireStakeTransaction(p, options)
@@ -395,6 +763,14 @@ export class ConsensusClient {
 
   /**
    * Returns a serialized `remove_stake` transaction.
+   *
+   * @param params - The parameters for the remove stake transaction.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.recipient - The recipient address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createRemoveStakeTransaction(p: RemoveStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRemoveStakeTransaction', params: [p.stakerWallet, p.recipient, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -403,6 +779,14 @@ export class ConsensusClient {
 
   /**
    * Sends a `remove_stake` transaction.
+   *
+   * @param params - The parameters for the remove stake transaction.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.recipient - The recipient address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendRemoveStakeTransaction(p: RemoveStakeTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRemoveStakeTransaction', params: [p.stakerWallet, p.recipient, p.value, p.fee, this.getValidityStartHeight(p)] }
@@ -411,6 +795,14 @@ export class ConsensusClient {
 
   /**
    * Sends a `remove_stake` transaction and waits for confirmation.
+   *
+   * @param params - The parameters for the remove stake transaction.
+   * @param params.stakerWallet - The staker wallet address.
+   * @param params.recipient - The recipient address.
+   * @param params.value - The value to transfer.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncRemoveStakeTransaction(p: RemoveStakeTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRemoveStakeTransaction(p, options)
@@ -424,6 +816,17 @@ export class ConsensusClient {
    * have a double Option. So we use the following work-around for the signal data:
    * "" = Set the signal data field to None.
    * "0x29a4b..." = Set the signal data field to Some(0x29a4b...).
+   *
+   * @param params - The parameters for the new validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.signingSecretKey - The signing secret key.
+   * @param params.votingSecretKey - The voting secret key.
+   * @param params.rewardAddress - The reward address.
+   * @param params.signalData - The signal data.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createNewValidatorTransaction(p: NewValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createNewValidatorTransaction', params: [p.senderWallet, p.validator, p.signingSecretKey, p.votingSecretKey, p.rewardAddress, p.signalData, p.fee, this.getValidityStartHeight(p)] }
@@ -437,6 +840,17 @@ export class ConsensusClient {
    * have a double Option. So we use the following work-around for the signal data:
    * "" = Set the signal data field to None.
    * "0x29a4b..." = Set the signal data field to Some(0x29a4b...).
+   *
+   * @param params - The parameters for the new validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.signingSecretKey - The signing secret key.
+   * @param params.votingSecretKey - The voting secret key.
+   * @param params.rewardAddress - The reward address.
+   * @param params.signalData - The signal data.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendNewValidatorTransaction(p: NewValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendNewValidatorTransaction', params: [p.senderWallet, p.validator, p.signingSecretKey, p.votingSecretKey, p.rewardAddress, p.signalData, p.fee, this.getValidityStartHeight(p)] }
@@ -451,6 +865,17 @@ export class ConsensusClient {
    * have a double Option. So we use the following work-around for the signal data:
    * "" = Set the signal data field to None.
    * "0x29a4b..." = Set the signal data field to Some(0x29a4b...).
+   *
+   * @param params - The parameters for the new validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.signingSecretKey - The signing secret key.
+   * @param params.votingSecretKey - The voting secret key.
+   * @param params.rewardAddress - The reward address.
+   * @param params.signalData - The signal data.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncNewValidatorTransaction(p: NewValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendNewValidatorTransaction(p, options)
@@ -465,6 +890,17 @@ export class ConsensusClient {
    * null = No change in the signal data field.
    * "" = Change the signal data field to None.
    * "0x29a4b..." = Change the signal data field to Some(0x29a4b...).
+   *
+   * @param params - The parameters for the update validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.newSigningSecretKey - The new signing secret key.
+   * @param params.newVotingSecretKey - The new voting secret key.
+   * @param params.newRewardAddress - The new reward address.
+   * @param params.newSignalData - The new signal data.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createUpdateValidatorTransaction(p: UpdateValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createUpdateValidatorTransaction', params: [p.senderWallet, p.validator, p.newSigningSecretKey, p.newVotingSecretKey, p.newRewardAddress, p.newSignalData, p.fee, this.getValidityStartHeight(p)] }
@@ -479,6 +915,17 @@ export class ConsensusClient {
    * null = No change in the signal data field.
    * "" = Change the signal data field to None.
    * "0x29a4b..." = Change the signal data field to Some(0x29a4b...).
+   *
+   * @param params - The parameters for the update validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.newSigningSecretKey - The new signing secret key.
+   * @param params.newVotingSecretKey - The new voting secret key.
+   * @param params.newRewardAddress - The new reward address.
+   * @param params.newSignalData - The new signal data.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendUpdateValidatorTransaction(p: UpdateValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendUpdateValidatorTransaction', params: [p.senderWallet, p.validator, p.newSigningSecretKey, p.newVotingSecretKey, p.newRewardAddress, p.newSignalData, p.fee, this.getValidityStartHeight(p)] }
@@ -493,6 +940,17 @@ export class ConsensusClient {
    * null = No change in the signal data field.
    * "" = Change the signal data field to None.
    * "0x29a4b..." = Change the signal data field to Some(0x29a4b...).
+   *
+   * @param params - The parameters for the update validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.newSigningSecretKey - The new signing secret key.
+   * @param params.newVotingSecretKey - The new voting secret key.
+   * @param params.newRewardAddress - The new reward address.
+   * @param params.newSignalData - The new signal data.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncUpdateValidatorTransaction(p: UpdateValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendUpdateValidatorTransaction(p, options)
@@ -502,6 +960,14 @@ export class ConsensusClient {
   /**
    * Returns a serialized `inactivate_validator` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
+   *
+   * @param params - The parameters for the deactivate validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.signingSecretKey - The signing secret key.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createDeactivateValidatorTransaction(p: DeactiveValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createDeactivateValidatorTransaction', params: [p.senderWallet, p.validator, p.signingSecretKey, p.fee, this.getValidityStartHeight(p)] }
@@ -511,6 +977,14 @@ export class ConsensusClient {
   /**
    * Sends a `inactivate_validator` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
+   *
+   * @param params - The parameters for the deactivate validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.signingSecretKey - The signing secret key.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendDeactivateValidatorTransaction(p: DeactiveValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendDeactivateValidatorTransaction', params: [p.senderWallet, p.validator, p.signingSecretKey, p.fee, this.getValidityStartHeight(p)] }
@@ -521,6 +995,14 @@ export class ConsensusClient {
    * Sends a `inactivate_validator` transaction and waits for confirmation.
    * You need to provide the address of a basic account (the sender wallet)
    * to pay the transaction fee.
+   *
+   * @param params - The parameters for the deactivate validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.signingSecretKey - The signing secret key.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncDeactivateValidatorTransaction(p: DeactiveValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendDeactivateValidatorTransaction(p, options)
@@ -530,6 +1012,14 @@ export class ConsensusClient {
   /**
    * Returns a serialized `reactivate_validator` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
+   *
+   * @param params - The parameters for the reactivate validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.signingSecretKey - The signing secret key.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createReactivateValidatorTransaction(p: ReactivateValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createReactivateValidatorTransaction', params: [p.senderWallet, p.validator, p.signingSecretKey, p.fee, this.getValidityStartHeight(p)] }
@@ -539,6 +1029,14 @@ export class ConsensusClient {
   /**
    * Sends a `reactivate_validator` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
+   *
+   * @param params - The parameters for the reactivate validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.signingSecretKey - The signing secret key.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendReactivateValidatorTransaction(p: ReactivateValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendReactivateValidatorTransaction', params: [p.senderWallet, p.validator, p.signingSecretKey, p.fee, this.getValidityStartHeight(p)] }
@@ -549,6 +1047,14 @@ export class ConsensusClient {
    * Sends a `reactivate_validator` transaction and waits for confirmation.
    * You need to provide the address of a basic account (the sender wallet)
    * to pay the transaction fee.
+   *
+   * @param params - The parameters for the reactivate validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.signingSecretKey - The signing secret key.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncReactivateValidatorTransaction(p: ReactivateValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendReactivateValidatorTransaction(p, options)
@@ -558,6 +1064,13 @@ export class ConsensusClient {
   /**
    * Returns a serialized `retire_validator` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
+   *
+   * @param params - The parameters for the retire validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createRetireValidatorTransaction(p: RetireValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createRetireValidatorTransaction', params: [p.senderWallet, p.validator, p.fee, this.getValidityStartHeight(p)] }
@@ -567,6 +1080,13 @@ export class ConsensusClient {
   /**
    * Sends a `retire_validator` transaction. You need to provide the address of a basic
    * account (the sender wallet) to pay the transaction fee.
+   *
+   * @param params - The parameters for the retire validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendRetireValidatorTransaction(p: RetireValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendRetireValidatorTransaction', params: [p.senderWallet, p.validator, p.fee, this.getValidityStartHeight(p)] }
@@ -577,6 +1097,13 @@ export class ConsensusClient {
    * Sends a `retire_validator` transaction and waits for confirmation.
    * You need to provide the address of a basic account (the sender wallet)
    * to pay the transaction fee.
+   *
+   * @param params - The parameters for the retire validator transaction.
+   * @param params.senderWallet - The sender wallet address.
+   * @param params.validator - The validator address.
+   * @param params.fee - The transaction fee.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncRetireValidatorTransaction(p: RetireValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendRetireValidatorTransaction(p, options)
@@ -588,6 +1115,14 @@ export class ConsensusClient {
    * validator deposit that is being returned.
    * Note in order for this transaction to be accepted fee + value should be equal to the validator deposit, which is not a fixed value:
    * Failed delete validator transactions can diminish the validator deposit
+   *
+   * @param params - The parameters for the delete validator transaction.
+   * @param params.validator - The validator address.
+   * @param params.recipient - The recipient address.
+   * @param params.fee - The transaction fee.
+   * @param params.value - The value to transfer.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public createDeleteValidatorTransaction(p: DeleteValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'createDeleteValidatorTransaction', params: [p.validator, p.recipient, p.fee, p.value, this.getValidityStartHeight(p)] }
@@ -599,6 +1134,14 @@ export class ConsensusClient {
    * validator deposit that is being returned.
    * Note in order for this transaction to be accepted fee + value should be equal to the validator deposit, which is not a fixed value:
    * Failed delete validator transactions can diminish the validator deposit
+   *
+   * @param params - The parameters for the delete validator transaction.
+   * @param params.validator - The validator address.
+   * @param params.recipient - The recipient address.
+   * @param params.fee - The transaction fee.
+   * @param params.value - The value to transfer.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendDeleteValidatorTransaction(p: DeleteValidatorTxParams, options = DEFAULT_OPTIONS): Promise<RPCData<string> | Error> {
     const req = { method: 'sendDeleteValidatorTransaction', params: [p.validator, p.recipient, p.fee, p.value, this.getValidityStartHeight(p)] }
@@ -610,6 +1153,14 @@ export class ConsensusClient {
    * The transaction fee will be paid from the validator deposit that is being returned.
    * Note in order for this transaction to be accepted fee + value should be equal to the validator deposit, which is not a fixed value:
    * Failed delete validator transactions can diminish the validator deposit
+   *
+   * @param params - The parameters for the delete validator transaction.
+   * @param params.validator - The validator address.
+   * @param params.recipient - The recipient address.
+   * @param params.fee - The transaction fee.
+   * @param params.value - The value to transfer.
+   * @param options - Optional settings for the request.
+   * @returns A promise that resolves with the result of the call, which includes data and optionally metadata.
    */
   public sendSyncDeleteValidatorTransaction(p: DeleteValidatorTxParams, options = DEFAULT_OPTIONS_SEND_TX): Promise<RPCData<string> | Error> {
     return this.sendDeleteValidatorTransaction(p, options)

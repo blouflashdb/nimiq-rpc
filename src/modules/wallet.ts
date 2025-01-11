@@ -8,6 +8,9 @@ export interface CreateAccountParams { passphrase?: string }
 export interface SignParams { message: string, address: string, passphrase: string, isHex: boolean }
 export interface VerifySignatureParams { message: string, publicKey: string, signature: Signature, isHex: boolean }
 
+/**
+ * WalletClient class provides methods to interact with the Nimiq Albatross Node's wallet.
+ */
 export class WalletClient {
   private client: HttpClient
 

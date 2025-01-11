@@ -51,6 +51,9 @@ interface NotificationMessageParams {
   result: object
 };
 
+/**
+ * WebSocketClient class provides methods to interact with the Nimiq Albatross Node over WebSocket.
+ */
 export class WebSocketClient {
   private url: URL
   private isOpen = false
@@ -73,6 +76,15 @@ export class WebSocketClient {
     }
   }
 
+  /**
+   * Make a raw streaming call to the Albatross Node.
+   *
+   * @param request - The request object containing the following properties:
+   * @param request.method - The name of the method to call.
+   * @param request.params - The parameters to pass with the call, if any.
+   * @param userOptions - The streaming options for the call. Defaults to WS_DEFAULT_OPTIONS if not provided.
+   * @returns A promise that resolves with a Subscription object.
+   */
   async subscribe<
     Data,
     Metadata,

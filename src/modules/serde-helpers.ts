@@ -10,6 +10,9 @@ export interface HexDeserializationParams {
   hexString: string
 }
 
+/**
+ * SerdeHelper class provides methods to serialize and deserialize data.
+ */
 export class SerdeHelper {
   private client: HttpClient
 

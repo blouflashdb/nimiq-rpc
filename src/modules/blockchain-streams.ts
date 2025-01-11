@@ -22,6 +22,9 @@ const isMicro: FilterStreamFn = b => getBlockType(b) === BlockSubscriptionType.M
 const isMacro: FilterStreamFn = b => getBlockType(b) === BlockSubscriptionType.Macro
 const isElection: FilterStreamFn = b => getBlockType(b) === BlockSubscriptionType.Election
 
+/**
+ * BlockchainStream class provides methods to interact with the Nimiq Albatross Node's blockchain streams.
+ */
 export class BlockchainStream {
   ws: WebSocketClient
   constructor(ws: WebSocketClient) {
@@ -30,6 +33,9 @@ export class BlockchainStream {
 
   /**
    * Subscribes to block hash events.
+   *
+   * @param userOptions - Optional streaming options.
+   * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForBlockHashes<T = string, M = undefined>(
     userOptions?: Partial<StreamOptions>,
@@ -40,6 +46,10 @@ export class BlockchainStream {
 
   /**
    * Subscribes to election blocks.
+   *
+   * @param params - The block parameters.
+   * @param userOptions - Optional streaming options.
+   * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForElectionBlocks<T = Block, M = undefined>(
     params: BlockParams = {},
@@ -52,6 +62,10 @@ export class BlockchainStream {
 
   /**
    * Subscribes to micro blocks.
+   *
+   * @param params - The block parameters.
+   * @param userOptions - Optional streaming options.
+   * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForMicroBlocks<T = MicroBlock, M = undefined>(
     params: BlockParams = {},
@@ -64,6 +78,10 @@ export class BlockchainStream {
 
   /**
    * Subscribes to macro blocks.
+   *
+   * @param params - The block parameters.
+   * @param userOptions - Optional streaming options.
+   * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForMacroBlocks<T = MacroBlock, M = undefined>(
     params: BlockParams = {},
@@ -76,6 +94,10 @@ export class BlockchainStream {
 
   /**
    * Subscribes to all blocks.
+   *
+   * @param params - The block parameters.
+   * @param userOptions - Optional streaming options.
+   * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForBlocks<T = Block, M = undefined>(
     params: BlockParams = {},
@@ -87,6 +109,10 @@ export class BlockchainStream {
 
   /**
    * Subscribes to pre epoch validators events.
+   *
+   * @param params - The validator election parameters.
+   * @param userOptions - Optional streaming options.
+   * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForValidatorElectionByAddress<T = Validator, M = BlockchainState>(
     params: ValidatorElectionParams,
@@ -97,6 +123,10 @@ export class BlockchainStream {
 
   /**
    * Subscribes to log events related to a given list of addresses and log types.
+   *
+   * @param params - The log parameters.
+   * @param userOptions - Optional streaming options.
+   * @returns A promise that resolves with a Subscription object.
    */
   public subscribeForLogsByAddressesAndTypes<T = BlockLog, M = BlockchainState>(
     params: LogsParams = {},
