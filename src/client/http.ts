@@ -56,8 +56,12 @@ export class HttpClient {
     request: RequestArguments,
     options: HttpOptions,
   ): Promise<RPCData<Data, Metadata>> {
+    try {
       const result = await this.client.request(request, options.timeout)
       const data = result as IJSONRPCResponse
-      return data.result as RPCData<Data, Metadata>
+      return Promise.resolve(data.result)
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 }
