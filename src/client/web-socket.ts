@@ -17,11 +17,6 @@ export interface Subscription {
   close: () => void;
 
   /**
-   * The WebSocket client instance.
-   */
-  ws: Client;
-
-  /**
    * Gets the subscription ID.
    *
    * @returns {number} - The subscription ID.
@@ -152,61 +147,76 @@ export class WebSocketClient {
     options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
     streamOptions: WebsocketStreamOptions = DEFAULT_STREAM_OPTIONS,
   ): Promise<Subscription> {
-    const transport = new WebSocketTransport(this.url.toString());
-    const client = new Client(new RequestManager([transport]));
+    let client: Client | null = null;
     let disconnects = 0;
+    let subscriptionId = 0;
+    let forceClose = false;
 
-    client.onNotification((event) => {
-      const params = event.params as NotificationMessageParams;
-      const result = params.result as RPCData<Data, Metadata>;
+    function createClient(url: URL): Client {
+      const transport = new WebSocketTransport(url.toString());
+      const client = new Client(new RequestManager([transport]));
 
-      if (streamOptions.filter && !streamOptions.filter(result.data)) {
-        return;
+      client.onNotification((event) => {
+        const params = event.params as NotificationMessageParams;
+        const result = params.result as RPCData<Data, Metadata>;
+  
+        if (streamOptions.filter && !streamOptions.filter(result.data)) {
+          return;
+        }
+  
+        wsCallbacks.onMessage?.(result);
+      });
+  
+      client.onError((error) => {
+        wsCallbacks.onError?.(error);
+      });
+  
+      transport.connection.addEventListener("open", () => {
+        disconnects = 0;
+      });
+  
+      transport.connection.addEventListener("close", () => {
+        if (forceClose) {
+          return;
+        }
+        disconnects++;
+        if (disconnects <= options.maxReconnects) {
+          setTimeout(() => {
+            reconnect(url);
+          }, options.reconnectTimeout);
+        }
+      });
+  
+      transport.connection.onerror = (event) => {
+        wsCallbacks.onConnectionError?.(new Error(event.message));
+      };
+
+      return client;
+    }
+
+    async function reconnect(url: URL): Promise<void> {
+      client?.close();
+      client = null;
+
+      subscriptionId = await requestSubscription(url);
+    }
+
+    async function requestSubscription(url: URL): Promise<number> {
+      if(!client) {
+        client = createClient(url);
       }
 
-      wsCallbacks.onMessage?.(result);
-    });
+      return await client.request(request, options.callTimeout);
+    }
 
-    client.onError((error) => {
-      wsCallbacks.onError?.(error);
-    });
-
-    transport.connection.addEventListener("open", () => {
-      disconnects = 0;
-    });
-
-    transport.connection.addEventListener("close", () => {
-      disconnects++;
-      if (disconnects <= options.maxReconnects) {
-        setTimeout(() => {
-          reconnect();
-        }, options.reconnectTimeout);
-      }
-    });
-
-    transport.connection.onerror = (event) => {
-      wsCallbacks.onConnectionError?.(new Error(event.message));
-    };
-
-    const close = () => client.close();
-
-    let subscriptionId: number = await client.request(
-      request,
-      options.callTimeout,
-    );
-
-    const reconnect = async () => {
-      close();
-
-      subscriptionId = await client.request(request, options.callTimeout);
-    };
+    subscriptionId = await requestSubscription(this.url);
 
     const args: Subscription = {
       close: () => {
-        client.close();
+        forceClose = true;
+        client?.close();
       },
-      getSubscriptionId: () => subscriptionId,
-      ws: client,
+      getSubscriptionId: () => subscriptionId
     };
 
     return args;

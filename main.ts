@@ -1,9 +1,9 @@
 import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
 import type { HttpOptions } from './src/client/http.ts'
-import type { StreamOptions, Subscription } from './src/client/web-socket.ts'
+import type { Subscription, WebSocketCallbacks, WebsocketClientOptions, WebsocketStreamOptions } from './src/client/web-socket.ts'
 import type { RPCData } from './src/types/logs.ts'
 import { DEFAULT_OPTIONS, HttpClient } from './src/client/http.ts'
-import { WebSocketClient } from './src/client/web-socket.ts'
+import { DEFAULT_CLIENT_OPTIONS, DEFAULT_STREAM_OPTIONS, WebSocketClient } from './src/client/web-socket.ts'
 import * as Modules from './src/modules/index.ts'
 
 /**
@@ -64,8 +64,12 @@ export class NimiqRPCClient {
   /**
    * Make a raw streaming call to the Albatross Node.
    *
-   * @param request
-   * @param userOptions
+   * @param request - The request object containing the following properties:
+   * @param request.method - The name of the method to call.
+   * @param request.params - The parameters to pass with the call, if any.
+   * @param wsCallbacks - The WebSocket callbacks.
+   * @param options - The WebSocket client options. Defaults to DEFAULT_CLIENT_OPTIONS if not provided.
+   * @param streamOptions - The WebSocket stream options. Defaults to DEFAULT_STREAM_OPTIONS if not provided.
    * @returns A promise that resolves with a Subscription object.
    */
   subscribe<
@@ -73,9 +77,11 @@ export class NimiqRPCClient {
     Metadata,
   >(
     request: RequestArguments,
-    userOptions: StreamOptions,
-  ): Promise<Subscription<Data, Metadata>> {
-    return this.ws.subscribe<Data, Metadata>(request, userOptions)
+    wsCallbacks: WebSocketCallbacks<Data, Metadata>,
+    options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
+    streamOptions: WebsocketStreamOptions = DEFAULT_STREAM_OPTIONS,
+  ): Promise<Subscription> {
+    return this.ws.subscribe<Data, Metadata>(request, wsCallbacks, options, streamOptions)
   }
 }
 
