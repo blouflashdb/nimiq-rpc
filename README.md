@@ -75,6 +75,44 @@ console.log(subscribtion.getSubscriptionId());
 subscribtion.close();
 ```
 
+### Auth
+Auth is not supported however you can use a proxy like nginx and pass the auth token via query url. I recommend to use tls.
+```
+const client = new NimiqRPCClient("http://localhost/?token=mysecrettoken", "ws://localhost/ws?token=mysecrettoken");
+```
+
+NGINX Config:
+```
+http {
+    server {
+        listen 80;
+
+        location / {
+            # Check the token from the query parameter (?token=...)
+            if ($arg_token != "mysecrettoken") {
+                return 403;  # Deny if the token is missing or invalid
+            }
+
+            # Forward valid requests to the node
+            proxy_pass http://127.0.0.1:8648;
+        }
+
+        location /ws {
+            # Check the token from the query parameter (?token=...)
+            if ($arg_token != "mysecrettoken") {
+                return 403;  # Deny if the token is missing or invalid
+            }
+
+            proxy_pass http://127.0.0.1:8648;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "Upgrade";
+            proxy_read_timeout 3600;
+        }
+    }
+}
+```
+
 ## License
 
 Released under [MIT](/LICENSE) by [@blouflashdb](https://github.com/blouflashdb).
