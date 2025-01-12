@@ -1,13 +1,22 @@
+/**
+ * Represents the validity start height for a transaction.
+ */
 export type ValidityStartHeight =
   | { relativeValidityStartHeight: number }
   | { absoluteValidityStartHeight: number }
 
+/**
+ * Enum representing different hash algorithms.
+ */
 export enum HashAlgorithm {
   Blake2b = 1,
   Sha256 = 3,
   Sha512 = 4,
 }
 
+/**
+ * Enum representing different account types.
+ */
 export enum AccountType {
   Basic = 'basic',
   Vesting = 'vesting',
@@ -15,6 +24,9 @@ export enum AccountType {
   Staking = 'staking',
 }
 
+/**
+ * Enum representing different inherent types.
+ */
 export enum InherentType {
   Reward = 'reward',
   Jail = 'jail',
@@ -101,12 +113,18 @@ export interface PolicyConstants {
   blockSeparationTime: number
 }
 
+/**
+ * Represents a basic account in the blockchain.
+ */
 export interface BasicAccount {
   type: AccountType.Basic
   address: string
   balance: number
 }
 
+/**
+ * Represents a vesting account in the blockchain.
+ */
 export interface VestingAccount {
   type: AccountType.Vesting
   address: string
@@ -118,6 +136,9 @@ export interface VestingAccount {
   vestingTotalAmount: number
 }
 
+/**
+ * Represents an HTLC (Hashed Time-Locked Contract) account in the blockchain.
+ */
 export interface HtlcAccount {
   type: AccountType.HTLC
   address: string
@@ -130,13 +151,23 @@ export interface HtlcAccount {
   totalAmount: number
 }
 
+/**
+ * Represents a staking account in the blockchain.
+ */
 export interface StakingAccount {
   type: AccountType.Staking
   address: string
   balance: number
 }
 
+/**
+ * Represents an account in the blockchain, which can be of different types.
+ */
 export type Account = BasicAccount | VestingAccount | HtlcAccount | StakingAccount
+
+/**
+ * Represents a transaction in the blockchain.
+ */
 export interface Transaction {
   hash: string
   blockNumber?: number // Optional, corresponds to Option<u32>
@@ -158,6 +189,9 @@ export interface Transaction {
   networkId: number // Corresponds to u8
 }
 
+/**
+ * Represents a staker in the blockchain.
+ */
 export interface Staker {
   address: string
   balance: number
@@ -167,6 +201,9 @@ export interface Staker {
   retiredBalance: number
 }
 
+/**
+ * Represents a validator in the blockchain.
+ */
 export interface Validator {
   address: string
   signingKey: string
@@ -176,26 +213,29 @@ export interface Validator {
   balance: number
 
   /**
-   * The total amount of stakers in the valiator
+   * The total amount of stakers in the validator.
    */
   numStakers: number
 
   /**
-   * Wether the validator has been retired
+   * Whether the validator has been retired.
    */
   retired: boolean
 
   /**
-   * The block in which the validator was inactive from
+   * The block in which the validator was inactive from.
    */
   inactivityFlag?: number
 
   /**
-   * The block in which the validator was jailed from
+   * The block in which the validator was jailed from.
    */
   jailedFrom?: number
 }
 
+/**
+ * Represents a slot in the blockchain.
+ */
 export interface Slot {
   firstSlotNumber: number
   numSlots: number
@@ -203,11 +243,17 @@ export interface Slot {
   publicKey: string
 }
 
+/**
+ * Represents penalized slots in the blockchain.
+ */
 export interface PenalizedSlots {
   blockNumber: number
   disabled: number[]
 }
 
+/**
+ * Represents an inherent reward in the blockchain.
+ */
 export interface InherentReward {
   type: InherentType.Reward
   blockNumber: number
@@ -218,6 +264,9 @@ export interface InherentReward {
   hash: string
 }
 
+/**
+ * Represents an inherent penalize action in the blockchain.
+ */
 export interface InherentPenalize {
   type: InherentType.Penalize
   blockNumber: number
@@ -226,6 +275,9 @@ export interface InherentPenalize {
   offenseEventBlock: number
 }
 
+/**
+ * Represents an inherent jail action in the blockchain.
+ */
 export interface InherentJail {
   type: InherentType.Jail
   blockNumber: number
@@ -234,8 +286,14 @@ export interface InherentJail {
   offenseEventBlock: number
 }
 
+/**
+ * Represents an inherent action in the blockchain, which can be of different types.
+ */
 export type Inherent = InherentReward | InherentPenalize | InherentJail
 
+/**
+ * Represents information about the mempool in the blockchain.
+ */
 export interface MempoolInfo {
   _0?: number
   _1?: number
@@ -255,44 +313,68 @@ export interface MempoolInfo {
   buckets: number[]
 }
 
+/**
+ * Represents a wallet account in the blockchain.
+ */
 export interface WalletAccount {
   address: string
   publicKey: string
   privateKey: string
 }
 
+/**
+ * Represents a signature in the blockchain.
+ */
 export interface Signature {
   signature: string
   publicKey: string
 }
 
+/**
+ * Represents the state of the ZKP (Zero-Knowledge Proof) component in the blockchain.
+ */
 export interface ZKPState {
   latestBlock: Block
   latestProof?: string
 }
 
+/**
+ * Represents the state of the blockchain.
+ */
 export interface BlockchainState {
   blockNumber: number
   blockHash: string
 }
 
+/**
+ * Enum representing different block types.
+ */
 export enum BlockType {
   Micro = 'micro',
   Macro = 'macro',
 }
 
+/**
+ * Enum representing different block subscription types.
+ */
 export enum BlockSubscriptionType {
   Macro = 'macro',
   Micro = 'micro',
   Election = 'election',
 }
 
+/**
+ * Enum representing different retrieve types.
+ */
 export enum RetrieveType {
   Full = 'full',
   Partial = 'partial',
   Hash = 'hash',
 }
 
+/**
+ * Enum representing different network IDs.
+ */
 enum NetworkId {
   Test = 1,
   Dev = 2,
@@ -306,26 +388,40 @@ enum NetworkId {
   MainAlbatross = 24,
 }
 
+/**
+ * Represents a fork proof in the blockchain.
+ */
 export interface ForkProof {
   blockNumber: number
   hashes: [string, string]
 }
 
+/**
+ * Represents a double proposal proof in the blockchain.
+ */
 export interface DoubleProposalProof {
   blockNumber: number
   hashes: [string, string]
 }
 
+/**
+ * Represents a double vote proof in the blockchain.
+ */
 export interface DoubleVoteProof {
   blockNumber: number
 }
 
+/**
+ * Represents an equivocation proof in the blockchain, which can be of different types.
+ */
 export type EquivocationProof =
   | { type: 'Fork', proof: ForkProof }
   | { type: 'DoubleProposal', proof: DoubleProposalProof }
   | { type: 'DoubleVote', proof: DoubleVoteProof }
 
-// Block types
+/**
+ * Represents a partial block in the blockchain.
+ */
 export interface PartialBlock {
   hash: string
   size: number
@@ -343,6 +439,9 @@ export interface PartialBlock {
   transactions?: Transaction[]
 }
 
+/**
+ * Represents a partial micro block in the blockchain.
+ */
 export interface PartialMicroBlock extends PartialBlock {
   type: BlockType.Micro
   producer: {
@@ -365,6 +464,9 @@ export interface PartialMicroBlock extends PartialBlock {
   parentElectionHash?: undefined
 }
 
+/**
+ * Represents a micro block in the blockchain.
+ */
 export interface MicroBlock extends PartialMicroBlock {
   transactions: Transaction[]
   isElectionBlock?: undefined
@@ -375,6 +477,9 @@ export interface MicroBlock extends PartialMicroBlock {
   nextBatchInitialPunishedSet?: undefined
 }
 
+/**
+ * Represents a partial macro block in the blockchain.
+ */
 export interface PartialMacroBlock extends PartialBlock {
   type: BlockType.Macro
   epoch: number
@@ -383,6 +488,9 @@ export interface PartialMacroBlock extends PartialBlock {
   equivocationProofs?: undefined
 }
 
+/**
+ * Represents a macro block in the blockchain.
+ */
 export interface MacroBlock extends PartialMacroBlock {
   isElectionBlock: false
   transactions: Transaction[]
@@ -400,6 +508,9 @@ export interface MacroBlock extends PartialMacroBlock {
   nextBatchInitialPunishedSet?: undefined
 }
 
+/**
+ * Represents an election macro block in the blockchain.
+ */
 export interface ElectionMacroBlock extends PartialMacroBlock {
   isElectionBlock: true
   transactions: Transaction[]
@@ -408,4 +519,7 @@ export interface ElectionMacroBlock extends PartialMacroBlock {
   nextBatchInitialPunishedSet: number[]
 }
 
+/**
+ * Represents a block in the blockchain, which can be of different types.
+ */
 export type Block = MicroBlock | MacroBlock | ElectionMacroBlock
