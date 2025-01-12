@@ -10,16 +10,18 @@ A fully typed Nimiq RPC client for Nodejs and Deno.
 
 ### Installation
 deno:
-
-`deno add jsr:@blouflash/nimiq-rpc`
-
+```
+deno add jsr:@blouflash/nimiq-rpc
+```
 npm:
-
-`npx jsr add @blouflash/nimiq-rpc`
+```
+npx jsr add @blouflash/nimiq-rpc
+```
 
 pnpm: 
-
-`pnpm dlx jsr add @blouflash/nimiq-rpc`
+```
+pnpm dlx jsr add @blouflash/nimiq-rpc
+```
 
 ### Usage
 
@@ -77,7 +79,7 @@ subscribtion.close();
 
 ### Auth
 Auth is not supported however you can use a proxy like nginx and pass the auth token via query url. I recommend to use tls.
-```
+```typescript
 const client = new NimiqRPCClient("http://localhost/?token=mysecrettoken", "ws://localhost/ws?token=mysecrettoken");
 ```
 
