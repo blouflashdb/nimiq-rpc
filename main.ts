@@ -1,48 +1,75 @@
-import type { RequestArguments } from '@open-rpc/client-js/build/ClientInterface'
-import type { HttpOptions } from './src/client/http.ts'
-import type { Subscription, WebSocketCallbacks, WebsocketClientOptions, WebsocketStreamOptions } from './src/client/web-socket.ts'
-import type { RPCData } from './src/types/logs.ts'
-import { DEFAULT_OPTIONS, HttpClient } from './src/client/http.ts'
-import { DEFAULT_CLIENT_OPTIONS, DEFAULT_STREAM_OPTIONS, WebSocketClient } from './src/client/web-socket.ts'
-import * as Modules from './src/modules/index.ts'
+import type { RequestArguments } from "@open-rpc/client-js/build/ClientInterface";
+import type { HttpOptions } from "./src/client/http.ts";
+import type {
+  Subscription,
+  WebSocketCallbacks,
+  WebsocketClientOptions,
+  WebsocketStreamOptions,
+} from "./src/client/web-socket.ts";
+import type { RPCData } from "./src/types/logs.ts";
+import { DEFAULT_OPTIONS, HttpClient } from "./src/client/http.ts";
+import {
+  DEFAULT_CLIENT_OPTIONS,
+  DEFAULT_STREAM_OPTIONS,
+  WebSocketClient,
+} from "./src/client/web-socket.ts";
+import * as Modules from "./src/modules/index.ts";
 
 /**
  * NimiqRPCClient class provides methods to interact with the Nimiq Albatross Node.
  */
 export class NimiqRPCClient {
-  public http: HttpClient
-  public ws: WebSocketClient
-
-  public blockchain: Modules.BlockchainClient.BlockchainClient
-  public blockchainStreams: Modules.BlockchainStream.BlockchainStream
-  public consensus: Modules.ConsensusClient.ConsensusClient
-  public mempool: Modules.MempoolClient.MempoolClient
-  public network: Modules.NetworkClient.NetworkClient
-  public policy: Modules.PolicyClient.PolicyClient
-  public validator: Modules.ValidatorClient.ValidatorClient
-  public wallet: Modules.WalletClient.WalletClient
-  public zkpComponent: Modules.ZkpComponentClient.ZkpComponentClient
+  /**
+   * @property {HttpClient} http - The HTTP client instance.
+   * @property {WebSocketClient} ws - The WebSocket client instance.
+   * @property {Modules.BlockchainClient.BlockchainClient} blockchain - The Blockchain client instance.
+   * @property {Modules.BlockchainStream.BlockchainStream} blockchainStreams - The Blockchain streams instance.
+   * @property {Modules.ConsensusClient.ConsensusClient} consensus - The Consensus client instance.
+   * @property {Modules.MempoolClient.MempoolClient} mempool - The Mempool client instance.
+   * @property {Modules.NetworkClient.NetworkClient} network - The Network client instance.
+   * @property {Modules.PolicyClient.PolicyClient} policy - The Policy client instance.
+   * @property {Modules.ValidatorClient.ValidatorClient} validator - The Validator client instance.
+   * @property {Modules.WalletClient.WalletClient} wallet - The Wallet client instance.
+   * @property {Modules.ZkpComponentClient.ZkpComponentClient} zkpComponent - The ZKP Component client instance.
+   */
+  public http: HttpClient;
+  public ws: WebSocketClient;
+  public blockchain: Modules.BlockchainClient.BlockchainClient;
+  public blockchainStreams: Modules.BlockchainStream.BlockchainStream;
+  public consensus: Modules.ConsensusClient.ConsensusClient;
+  public mempool: Modules.MempoolClient.MempoolClient;
+  public network: Modules.NetworkClient.NetworkClient;
+  public policy: Modules.PolicyClient.PolicyClient;
+  public validator: Modules.ValidatorClient.ValidatorClient;
+  public wallet: Modules.WalletClient.WalletClient;
+  public zkpComponent: Modules.ZkpComponentClient.ZkpComponentClient;
 
   /**
-   * @param url Node URL
+   * @param {string} httpUrl - The HTTP URL of the node.
+   * @param {string} wsUrl - The WebSocket URL of the node.
    */
-  constructor(url: string) {
-    this.http = new HttpClient(url)
-    this.ws = new WebSocketClient(url)
+  constructor(
+    httpUrl: string = "http://localhost:8648",
+    wsUrl: string = "ws://localhost:8648/ws",
+  ) {
+    this.http = new HttpClient(httpUrl);
+    this.ws = new WebSocketClient(wsUrl);
 
-    this.blockchain = new Modules.BlockchainClient.BlockchainClient(this.http)
+    this.blockchain = new Modules.BlockchainClient.BlockchainClient(this.http);
     this.blockchainStreams = new Modules.BlockchainStream.BlockchainStream(
       this.ws,
-    )
+    );
     this.consensus = new Modules.ConsensusClient.ConsensusClient(
       this.http,
-    )
-    this.mempool = new Modules.MempoolClient.MempoolClient(this.http)
-    this.network = new Modules.NetworkClient.NetworkClient(this.http)
-    this.policy = new Modules.PolicyClient.PolicyClient(this.http)
-    this.validator = new Modules.ValidatorClient.ValidatorClient(this.http)
-    this.wallet = new Modules.WalletClient.WalletClient(this.http)
-    this.zkpComponent = new Modules.ZkpComponentClient.ZkpComponentClient(this.http)
+    );
+    this.mempool = new Modules.MempoolClient.MempoolClient(this.http);
+    this.network = new Modules.NetworkClient.NetworkClient(this.http);
+    this.policy = new Modules.PolicyClient.PolicyClient(this.http);
+    this.validator = new Modules.ValidatorClient.ValidatorClient(this.http);
+    this.wallet = new Modules.WalletClient.WalletClient(this.http);
+    this.zkpComponent = new Modules.ZkpComponentClient.ZkpComponentClient(
+      this.http,
+    );
   }
 
   /**
@@ -58,7 +85,7 @@ export class NimiqRPCClient {
     request: RequestArguments,
     options: HttpOptions = DEFAULT_OPTIONS,
   ): Promise<RPCData<Data, Metadata>> {
-    return this.http.call<Data, Metadata>(request, options)
+    return this.http.call<Data, Metadata>(request, options);
   }
 
   /**
@@ -81,11 +108,16 @@ export class NimiqRPCClient {
     options: WebsocketClientOptions = DEFAULT_CLIENT_OPTIONS,
     streamOptions: WebsocketStreamOptions<Data> = DEFAULT_STREAM_OPTIONS,
   ): Promise<Subscription> {
-    return this.ws.subscribe<Data, Metadata>(request, wsCallbacks, options, streamOptions)
+    return this.ws.subscribe<Data, Metadata>(
+      request,
+      wsCallbacks,
+      options,
+      streamOptions,
+    );
   }
 }
 
-let client: NimiqRPCClient
+let client: NimiqRPCClient;
 
 /**
  * Create a Nimiq RPC client.
@@ -94,14 +126,15 @@ let client: NimiqRPCClient
  * @returns A Nimiq RPC client.
  */
 export function createClient(url: string): NimiqRPCClient {
-  if (client)
-    return client
-  client = new NimiqRPCClient(url)
-  return client
+  if (client) {
+    return client;
+  }
+  client = new NimiqRPCClient(url);
+  return client;
 }
 
-export * from './src/client/http.ts'
-export * from './src/client/web-socket.ts'
-export * from './src/modules/index.ts'
-export * from './src/types/index.ts'
-export * from './src/types/logs.ts'
+export * from "./src/client/http.ts";
+export * from "./src/client/web-socket.ts";
+export * from "./src/modules/index.ts";
+export * from "./src/types/index.ts";
+export * from "./src/types/logs.ts";

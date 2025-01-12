@@ -28,7 +28,7 @@ It is structured the same way as the [`Rust RPC Client`](https://github.com/nimi
 ```typescript
 import { NimiqRPCClient } from '@blouflash/nimiq-rpc'
 
-const client = new NimiqRPCClient("http://localhost:8648");
+const client = new NimiqRPCClient();
 
 // async/await based example http call
 try {

@@ -117,12 +117,10 @@ interface NotificationMessageParams {
  * WebSocketClient class provides methods to interact with the Nimiq Albatross Node over WebSocket.
  */
 export class WebSocketClient {
-  private url: URL;
+  private url: string;
 
   constructor(url: string) {
-    const wsUrl = new URL(url.replace(/^http/, "ws"));
-    wsUrl.pathname = "/ws";
-    this.url = wsUrl;
+    this.url = url;
   }
 
   /**
@@ -155,7 +153,7 @@ export class WebSocketClient {
     let forceClose = false;
 
     function createClient(): Client {
-      const transport = new WebSocketTransport(clientUrl.toString());
+      const transport = new WebSocketTransport(clientUrl);
       const client = new Client(new RequestManager([transport]));
 
       client.onNotification((event) => {
