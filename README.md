@@ -153,6 +153,27 @@ The `BlockchainClient` class provides methods to interact with the blockchain.
 - `getStakersByValidatorAddress(address, options)`: Fetches all stakers for a given validator.
 - `getStakerByAddress(address, options)`: Tries to fetch a staker information given its address.
 
+#### Example Usage
+```typescript
+import { NimiqRPCClient } from '@blouflash/nimiq-rpc'
+
+const client = new NimiqRPCClient();
+
+// Example usage for getBlockNumber
+client.blockchain.getBlockNumber().then((result) => {
+  console.log("Block Number:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+
+// Example usage for getBlockByHash
+client.blockchain.getBlockByHash("some-block-hash").then((result) => {
+  console.log("Block by Hash:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+```
+
 ### BlockchainStream
 The `BlockchainStream` class provides methods to interact with the Nimiq Albatross Node's blockchain streams.
 
@@ -164,6 +185,31 @@ The `BlockchainStream` class provides methods to interact with the Nimiq Albatro
 - `subscribeForBlocks(params, wsCallbacks, options, streamOptions)`: Subscribes to all blocks.
 - `subscribeForValidatorElectionByAddress(params, wsCallbacks, options, streamOptions)`: Subscribes to pre epoch validators events.
 - `subscribeForLogsByAddressesAndTypes(params, wsCallbacks, options, streamOptions)`: Subscribes to log events related to a given list of addresses and log types.
+
+#### Example Usage
+```typescript
+import { NimiqRPCClient } from '@blouflash/nimiq-rpc'
+
+const client = new NimiqRPCClient();
+
+// Example usage for subscribeForBlockHashes
+const subscription = await client.blockchainStreams.subscribeForBlockHashes(
+  {
+    onMessage: (result) => {
+      console.log("Block Hash:", result);
+    },
+    onError: (error) => {
+      console.error("Error:", error);
+    },
+    onConnectionError: (error) => {
+      console.error("Connection Error:", error);
+    },
+  }
+);
+
+console.log("Subscription ID:", subscription.getSubscriptionId());
+subscription.close();
+```
 
 ### ConsensusClient
 The `ConsensusClient` class provides methods to interact with the consensus layer of the blockchain.
@@ -231,6 +277,35 @@ The `ConsensusClient` class provides methods to interact with the consensus laye
 - `sendDeleteValidatorTransaction(params, options)`: Sends a `delete_validator` transaction.
 - `sendSyncDeleteValidatorTransaction(params, options)`: Sends a `delete_validator` transaction and waits for confirmation.
 
+#### Example Usage
+```typescript
+import { NimiqRPCClient } from '@blouflash/nimiq-rpc'
+
+const client = new NimiqRPCClient();
+
+// Example usage for isConsensusEstablished
+client.consensus.isConsensusEstablished().then((result) => {
+  console.log("Consensus Established:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+
+// Example usage for sendTransaction
+const transactionParams = {
+  wallet: "wallet-address",
+  recipient: "recipient-address",
+  value: 1000,
+  fee: 1,
+  absoluteValidityStartHeight: 100
+};
+
+client.consensus.sendTransaction(transactionParams).then((result) => {
+  console.log("Transaction Sent:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+```
+
 ### MempoolClient
 The `MempoolClient` class provides methods to interact with the Nimiq Albatross Node's mempool.
 
@@ -241,6 +316,32 @@ The `MempoolClient` class provides methods to interact with the Nimiq Albatross 
 - `getMinFeePerByte(options)`: Obtains the minimum fee per byte as per mempool configuration.
 - `getTransactionFromMempool(hash, options)`: Fetches a transaction from the mempool given its hash.
 
+#### Example Usage
+```typescript
+import { NimiqRPCClient } from '@blouflash/nimiq-rpc'
+
+const client = new NimiqRPCClient();
+
+// Example usage for pushTransaction
+const transactionParams = {
+  transaction: "serialized-transaction",
+  withHighPriority: true
+};
+
+client.mempool.pushTransaction(transactionParams).then((result) => {
+  console.log("Transaction Pushed:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+
+// Example usage for mempoolContent
+client.mempool.mempoolContent({ includeTransactions: true }).then((result) => {
+  console.log("Mempool Content:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+```
+
 ### NetworkClient
 The `NetworkClient` class provides methods to interact with the Nimiq Albatross Node's network.
 
@@ -248,6 +349,27 @@ The `NetworkClient` class provides methods to interact with the Nimiq Albatross 
 - `getPeerId(options)`: The peer ID for our local peer.
 - `getPeerCount(options)`: Returns the number of peers.
 - `getPeerList(options)`: Returns a list with the IDs of all our peers.
+
+#### Example Usage
+```typescript
+import { NimiqRPCClient } from '@blouflash/nimiq-rpc'
+
+const client = new NimiqRPCClient();
+
+// Example usage for getPeerId
+client.network.getPeerId().then((result) => {
+  console.log("Peer ID:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+
+// Example usage for getPeerCount
+client.network.getPeerCount().then((result) => {
+  console.log("Peer Count:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+```
 
 ### PolicyClient
 The `PolicyClient` class provides methods to interact with the Nimiq Albatross Node's policy.
@@ -276,12 +398,56 @@ The `PolicyClient` class provides methods to interact with the Nimiq Albatross N
 - `getFirstBatchOfEpoch(blockNumber, options)`: Gets a boolean expressing if the batch at a given block number (height) is the first batch of the epoch.
 - `getSupplyAt(params, options)`: Gets the supply at a given time (as Unix time) in Lunas (1 NIM = 100,000 Lunas).
 
+#### Example Usage
+```typescript
+import { NimiqRPCClient } from '@blouflash/nimiq-rpc'
+
+const client = new NimiqRPCClient();
+
+// Example usage for getPolicyConstants
+client.policy.getPolicyConstants().then((result) => {
+  console.log("Policy Constants:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+
+// Example usage for getEpochAt
+client.policy.getEpochAt(1000).then((result) => {
+  console.log("Epoch at Block 1000:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+```
+
 ### SerdeHelper
 The `SerdeHelper` class provides methods to serialize and deserialize data.
 
 #### Methods
 - `serializeToHex(params, options)`: Serializes a byte array to a hexadecimal string.
 - `deserializeFromHex(params, options)`: Deserializes a hexadecimal string to a byte array.
+
+#### Example Usage
+```typescript
+import { NimiqRPCClient } from '@blouflash/nimiq-rpc'
+
+const client = new NimiqRPCClient();
+
+// Example usage for serializeToHex
+const data = new Uint8Array([1, 2, 3, 4]);
+client.serdeHelper.serializeToHex({ data }).then((result) => {
+  console.log("Serialized Hex:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+
+// Example usage for deserializeFromHex
+const hexString = "01020304";
+client.serdeHelper.deserializeFromHex({ hexString }).then((result) => {
+  console.log("Deserialized Data:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+```
 
 ### ValidatorClient
 The `ValidatorClient` class provides methods to interact with the Nimiq Albatross Node's validator.
@@ -293,6 +459,27 @@ The `ValidatorClient` class provides methods to interact with the Nimiq Albatros
 - `setAutomaticReactivation(params, options)`: Updates the configuration setting to automatically reactivate our validator.
 - `isElected(options)`: Returns whether our validator is elected.
 - `isSynced(options)`: Returns whether our validator is synced.
+
+#### Example Usage
+```typescript
+import { NimiqRPCClient } from '@blouflash/nimiq-rpc'
+
+const client = new NimiqRPCClient();
+
+// Example usage for getAddress
+client.validator.getAddress().then((result) => {
+  console.log("Validator Address:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+
+// Example usage for isElected
+client.validator.isElected().then((result) => {
+  console.log("Is Elected:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+```
 
 ### WalletClient
 The `WalletClient` class provides methods to interact with the Nimiq Albatross Node's wallet.
@@ -309,11 +496,55 @@ The `WalletClient` class provides methods to interact with the Nimiq Albatross N
 - `verifySignature(params, options)`: Verifies a signature.
 - `removeAccount(address, options)`: Removes an account.
 
+#### Example Usage
+```typescript
+import { NimiqRPCClient } from '@blouflash/nimiq-rpc'
+
+const client = new NimiqRPCClient();
+
+// Example usage for importRawKey
+const keyParams = {
+  keyData: "raw-key-data",
+  passphrase: "passphrase"
+};
+
+client.wallet.importRawKey(keyParams).then((result) => {
+  console.log("Imported Key Address:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+
+// Example usage for createAccount
+const accountParams = {
+  passphrase: "passphrase"
+};
+
+client.wallet.createAccount(accountParams).then((result) => {
+  console.log("Created Account:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+```
+
 ### ZkpComponentClient
 The `ZkpComponentClient` class provides methods to interact with the Nimiq Albatross Node's ZKP component.
 
 #### Methods
 - `getZkpState(options)`: Returns the latest header number, block number and proof.
+
+#### Example Usage
+```typescript
+import { NimiqRPCClient } from '@blouflash/nimiq-rpc'
+
+const client = new NimiqRPCClient();
+
+// Example usage for getZkpState
+client.zkpComponent.getZkpState().then((result) => {
+  console.log("ZKP State:", result);
+}).catch((error) => {
+  console.error("Error:", error);
+});
+```
 
 ## License
 
