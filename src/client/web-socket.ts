@@ -113,6 +113,35 @@ interface NotificationMessageParams {
   result: object;
 }
 
+class NimiqWebSocketTransport extends WebSocketTransport {
+  private decoder: TextDecoder;
+
+  constructor(uri: string) {
+    super(uri);
+    this.decoder = new TextDecoder();
+  }
+
+  public override connect(): Promise<void> {
+    return new Promise((resolve) => {
+      // workaround for nimiq sending binary data instead of text
+      this.connection.binaryType = "arraybuffer";
+      const cb = () => {
+        this.connection.removeEventListener("open", cb);
+        resolve();
+      };
+      this.connection.addEventListener("open", cb);
+      this.connection.addEventListener(
+        "message",
+        (message: { data: string | ArrayBuffer }) => {
+          const { data } = message;
+          const decodedData = typeof data === "string" ? data : this.decoder.decode(data);
+          this.transportRequestManager.resolveResponse(decodedData);
+        },
+      );
+    });
+  }
+}
+
 /**
  * WebSocketClient class provides methods to interact with the Nimiq Albatross Node over WebSocket.
  */
@@ -153,28 +182,28 @@ export class WebSocketClient {
     let forceClose = false;
 
     function createClient(): Client {
-      const transport = new WebSocketTransport(clientUrl);
+      const transport = new NimiqWebSocketTransport(clientUrl);
       const client = new Client(new RequestManager([transport]));
 
       client.onNotification((event) => {
         const params = event.params as NotificationMessageParams;
         const result = params.result as RPCData<Data, Metadata>;
-  
+
         if (streamOptions.filter && !streamOptions.filter(result.data)) {
           return;
         }
-  
+
         wsCallbacks.onMessage?.(result);
       });
-  
+
       client.onError((error) => {
         wsCallbacks.onError?.(error);
       });
-  
+
       transport.connection.addEventListener("open", () => {
         disconnects = 0;
       });
-  
+
       transport.connection.addEventListener("close", () => {
         if (forceClose) {
           return;
@@ -186,7 +215,7 @@ export class WebSocketClient {
           }, options.reconnectTimeout);
         }
       });
-  
+
       transport.connection.onerror = (event) => {
         wsCallbacks.onConnectionError?.(new Error(event.message));
       };
@@ -202,7 +231,7 @@ export class WebSocketClient {
     }
 
     function requestSubscription(): Promise<number> {
-      if(!client) {
+      if (!client) {
         client = createClient();
       }
 
@@ -216,7 +245,7 @@ export class WebSocketClient {
         forceClose = true;
         client?.close();
       },
-      getSubscriptionId: () => subscriptionId
+      getSubscriptionId: () => subscriptionId,
     };
 
     return args;
