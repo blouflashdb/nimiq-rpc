@@ -1,5 +1,5 @@
 import type { RequestArguments } from "@open-rpc/client-js/build/ClientInterface";
-import type { HttpOptions } from "./src/client/http.ts";
+import type { HttpOptions, HTTPTransportOptions } from "./src/client/http.ts";
 import type {
   Subscription,
   WebSocketCallbacks,
@@ -45,14 +45,25 @@ export class NimiqRPCClient {
   public zkpComponent: Modules.ZkpComponentClient.ZkpComponentClient;
 
   /**
-   * @param {string} httpUrl - The HTTP URL of the node.
-   * @param {string} wsUrl - The WebSocket URL of the node.
+   * Creates an instance of the NimiqRPCClient.
+   *
+   * @param {Object} [options] - The options for configuring the client.
+   * @param {string} [options.httpUrl="http://localhost:8648"] - The HTTP URL of the node. Defaults to "http://localhost:8648".
+   * @param {string} [options.wsUrl="ws://localhost:8648/ws"] - The WebSocket URL of the node. Defaults to "ws://localhost:8648/ws".
+   * @param {HTTPTransportOptions} [options.httpTransportOptions] - The HTTP transport options.
    */
   constructor(
-    httpUrl: string = "http://localhost:8648",
-    wsUrl: string = "ws://localhost:8648/ws",
+    {
+      httpUrl = "http://localhost:8648",
+      wsUrl = "ws://localhost:8648/ws",
+      httpTransportOptions,
+    }: {
+      httpUrl?: string;
+      wsUrl?: string;
+      httpTransportOptions?: HTTPTransportOptions;
+    } = {},
   ) {
-    this.http = new HttpClient(httpUrl);
+    this.http = new HttpClient(httpUrl, httpTransportOptions);
     this.ws = new WebSocketClient(wsUrl);
 
     this.blockchain = new Modules.BlockchainClient.BlockchainClient(this.http);
@@ -115,22 +126,6 @@ export class NimiqRPCClient {
       streamOptions,
     );
   }
-}
-
-let client: NimiqRPCClient;
-
-/**
- * Create a Nimiq RPC client.
- *
- * @param url Node URL
- * @returns A Nimiq RPC client.
- */
-export function createClient(url: string): NimiqRPCClient {
-  if (client) {
-    return client;
-  }
-  client = new NimiqRPCClient(url);
-  return client;
 }
 
 export * from "./src/client/http.ts";

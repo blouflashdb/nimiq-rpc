@@ -20,6 +20,12 @@ export const DEFAULT_OPTIONS_SEND_TX: SendTxCallOptions = {
   timeout: DEFAULT_TIMEOUT_CONFIRMATION,
 }
 
+export interface HTTPTransportOptions {
+  headers?: Record<string, string>;
+  // deno-lint-ignore no-explicit-any
+  fetcher?: any;
+}
+
 /**
  * HttpClient class provides methods to interact with the Nimiq Albatross Node over HTTP.
  */
@@ -27,13 +33,18 @@ export class HttpClient {
   private client: Client
 
   /**
-   * @param url Node URL
+   * Creates an instance of the HTTP client.
+   * 
+   * @param {string} url - Node URL
+   * @param {HTTPTransportOptions} [options] - Optional HTTP transport options
    */
-  constructor(url: string) {
+  constructor(url: string, options?: HTTPTransportOptions) {
     const transport = new HTTPTransport(url, {
       headers: {
+        ...options?.headers,
         'Content-Type': 'application/json',
       },
+      fetcher: options?.fetcher,
     })
 
     this.client = new Client(new RequestManager([transport]))
