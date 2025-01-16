@@ -4,7 +4,7 @@
 [![Made with Deno](https://img.shields.io/badge/Deno-2-f7df1e?logo=deno&logoColor=white)](https://deno.land "Go to Deno homepage")
 [![License](https://img.shields.io/badge/License-MIT-f7df1e)](#license)
 
-A fully typed Nimiq RPC client for Nodejs and Deno.
+A fully typed Nimiq RPC client for every javascript runtime.
 
 ## Table of Contents
 - [Nimiq RPC Client for TypeScript](#nimiq-rpc-client-for-typescript)
