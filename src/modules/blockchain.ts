@@ -23,7 +23,7 @@ export interface GetSlotAtBlockParams {
 }
 export interface GetTransactionsByAddressParams {
   max: number
-  startAt: string
+  startAt?: string
   justHashes?: boolean
 }
 export interface GetValidatorByAddressParams { address: string }
