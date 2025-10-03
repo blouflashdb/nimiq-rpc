@@ -55,7 +55,7 @@ export class NimiqRPCClient {
   constructor(
     {
       httpUrl = "http://localhost:8648",
-      wsUrl = "ws://localhost:8648/ws",
+      wsUrl = "ws://localhost:8648/ws?frame=text",
       httpTransportOptions,
     }: {
       httpUrl?: string;

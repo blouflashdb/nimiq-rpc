@@ -113,35 +113,6 @@ interface NotificationMessageParams {
   result: object;
 }
 
-class NimiqWebSocketTransport extends WebSocketTransport {
-  private decoder: TextDecoder;
-
-  constructor(uri: string) {
-    super(uri);
-    this.decoder = new TextDecoder();
-  }
-
-  public override connect(): Promise<void> {
-    return new Promise((resolve) => {
-      // workaround for nimiq sending binary data instead of text
-      this.connection.binaryType = "arraybuffer";
-      const cb = () => {
-        this.connection.removeEventListener("open", cb);
-        resolve();
-      };
-      this.connection.addEventListener("open", cb);
-      this.connection.addEventListener(
-        "message",
-        (message: { data: string | ArrayBuffer }) => {
-          const { data } = message;
-          const decodedData = typeof data === "string" ? data : this.decoder.decode(data);
-          this.transportRequestManager.resolveResponse(decodedData);
-        },
-      );
-    });
-  }
-}
-
 /**
  * WebSocketClient class provides methods to interact with the Nimiq Albatross Node over WebSocket.
  */
@@ -182,7 +153,7 @@ export class WebSocketClient {
     let forceClose = false;
 
     function createClient(): Client {
-      const transport = new NimiqWebSocketTransport(clientUrl);
+      const transport = new WebSocketTransport(clientUrl);
       const client = new Client(new RequestManager([transport]));
 
       client.onNotification((event) => {
